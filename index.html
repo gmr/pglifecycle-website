@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>pglifecycle — your PostgreSQL schema as version-controlled data</title>
-<meta name="description" content="pglifecycle keeps your PostgreSQL schema in version-controlled YAML — one file per object, validated against a JSON-Schema contract, round-tripped through native pg_dump/pg_restore.">
+<title>pglifecycle: Your PostgreSQL schema as version-controlled data</title>
+<meta name="description" content="pglifecycle keeps your PostgreSQL schema in version-controlled YAML: one file per object, validated against a JSON-Schema contract, round-tripped through native pg_dump/pg_restore.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -50,7 +50,7 @@
   <div class="container hero-grid">
     <div class="hero-left">
       <h1 class="reveal">Your PostgreSQL schema, <span class="accent">as version-controlled data.</span></h1>
-      <p class="hero-sub reveal">pglifecycle keeps your schema in plain YAML — one file per object, validated against a JSON-Schema contract, and round-tripped through native <code>pg_dump</code> / <code>pg_restore</code>.</p>
+      <p class="hero-sub reveal">pglifecycle keeps your schema in plain YAML: One file per object, validated against a JSON-Schema contract, and round-tripped through native <code>pg_dump</code> / <code>pg_restore</code>.</p>
       <div class="hero-cta reveal">
         <a class="btn btn-primary" href="#get-started">Install the binary <span class="arr">→</span></a>
         <a class="btn btn-ghost" href="#proof">See the round-trip proof</a>
@@ -63,7 +63,7 @@
 
       <div class="oneliners reveal">
         <div class="label">How people describe it</div>
-        <div class="oneliner"><span class="n">01</span><span>Git for your database schema — declared as data, not migrations.</span></div>
+        <div class="oneliner"><span class="n">01</span><span>Git for your database schema, declared as data rather than migrations.</span></div>
         <div class="oneliner"><span class="n">02</span><span>Introspect a live Postgres database into reviewable YAML, then build it back, byte-for-byte.</span></div>
         <div class="oneliner"><span class="n">03</span><span>A declarative schema toolkit that speaks <code>pg_dump</code> fluently.</span></div>
       </div>
@@ -74,10 +74,10 @@
         <div class="term-bar">
           <div class="term-dots"><i></i><i></i><i></i></div>
           <span class="term-title">~/app · <b>zsh</b></span>
-          <div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull --dbname app_production -d schema/">copy</button></div>
+          <div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull --dbname app_production schema/">copy</button></div>
         </div>
         <div class="term-body">
-<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">--dbname</span> <span class="arg">app_production</span> <span class="flag">-d</span> <span class="arg">schema/</span></span>
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">--dbname</span> <span class="arg">app_production</span> <span class="arg">schema/</span></span>
 <span class="out"><span class="dim">  introspecting app_production …</span></span>
 <span class="out">  <span class="ok">✓</span> 41 tables    <span class="ok">✓</span> 12 views     <span class="ok">✓</span> 9 functions</span>
 <span class="out">  <span class="ok">✓</span> 6 roles      <span class="ok">✓</span> 88 grants    <span class="ok">✓</span> 3 sequences</span>
@@ -98,17 +98,17 @@
 <section class="section problem" id="problem">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">01 — The problem</span>
+      <span class="kicker-num">01: The problem</span>
       <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>Migrations hide state</span>
       <h2>Ordered migration files tell you how you got here. They never tell you where you are.</h2>
-      <p class="lead">A folder of <code>0001_…sql</code>, <code>0002_…sql</code> is a transaction log, not a schema. To know the current shape of a table you replay history in your head — or you dump the database and read raw SQL. The declared state is never written down.</p>
+      <p class="lead">A folder of <code>0001_…sql</code>, <code>0002_…sql</code> is a transaction log, not a schema. To know the current shape of a table you replay history in your head, or you dump the database and read raw SQL. The declared state is never written down.</p>
     </div>
 
     <div class="compare">
       <div class="compare-col reveal">
         <span class="compare-tag bad">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
-          Migrations — the log
+          Migrations: the log
         </span>
         <h3>State is implied, never stated</h3>
         <p>The shape of <code>users</code> lives scattered across dozens of append-only SQL files. Reviewers approve deltas they can't fully picture. Drift goes unnoticed.</p>
@@ -123,7 +123,7 @@
       <div class="compare-col good reveal">
         <span class="compare-tag ok">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
-          pglifecycle — the state
+          pglifecycle: the state
         </span>
         <h3>State is the source of truth</h3>
         <p>pglifecycle inverts the model: it versions the <b>declared state</b> as structured data. One object, one file. The current shape of <code>users</code> is exactly what's on disk.</p>
@@ -138,7 +138,7 @@
 
     <div class="problem-note reveal">
       <span class="arr">↳</span>
-      <span>Migrations still run the deploy. pglifecycle owns the <b>declaration</b> — the canonical, diffable picture of what your database should look like, kept honest by a round-trip test gate.</span>
+      <span>Migrations still run the deploy. pglifecycle owns the <b>declaration</b>: the canonical, diffable picture of what your database should look like, kept honest by a round-trip test gate.</span>
     </div>
   </div>
 </section>
@@ -147,9 +147,9 @@
 <section class="section" id="commands">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">02 — The commands</span>
-      <h2>Three verbs. That's the whole surface area.</h2>
-      <p class="lead">pglifecycle does three things, and they compose into everything else: read a database into files, turn files into SQL, and stand a database up from files.</p>
+      <span class="kicker-num">02: The commands</span>
+      <h2>Four commands. That's the whole surface area.</h2>
+      <p class="lead">pglifecycle does four things, and they compose into everything else: scaffold a new project, read a live database into files, compile files into a restorable archive, and apply the declared state to a live database.</p>
     </div>
 
     <div class="verbs-tabs reveal" id="verbTabs">
@@ -159,11 +159,15 @@
       </button>
       <button class="verb-tab" data-verb="build">
         <span class="vname"><span class="num">02</span>build</span>
-        <span class="vdesc">Compile the YAML directory into ordered SQL.</span>
+        <span class="vdesc">Compile the YAML directory into a <code>pg_restore</code>-ready archive.</span>
       </button>
       <button class="verb-tab" data-verb="create">
         <span class="vname"><span class="num">03</span>create</span>
-        <span class="vdesc">Create a database directly from the declaration.</span>
+        <span class="vdesc">Scaffold a new empty project directory.</span>
+      </button>
+      <button class="verb-tab" data-verb="deploy">
+        <span class="vname"><span class="num">04</span>deploy <span class="pill" style="font-size:10px;padding:1px 6px;vertical-align:middle;margin-left:4px;">planned</span></span>
+        <span class="vdesc">Diff declared state against a live database and apply changes.</span>
       </button>
     </div>
 
@@ -176,16 +180,17 @@
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tables, views, functions, sequences, types, roles, and grants.</li>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> SQL bodies parsed with tree-sitter and auto-formatted on the way out.</li>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Output validated against the JSON-Schema contract before it lands.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <code style="white-space:nowrap">--update</code>: Merge fresh introspection into an existing project, preserving comments and ordering. <span class="pill" style="font-size:11px;padding:1px 7px;vertical-align:middle;">planned</span></li>
         </ul>
       </div>
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle pull</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull --dbname app_production -d schema/">copy</button></div></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle pull</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull --dbname app_production schema/">copy</button></div></div>
           <div class="term-body">
 <pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="t-com"># db → files</span></span>
 <span class="cmd">    <span class="flag">--dbname</span> <span class="arg">app_production</span></span>
-<span class="cmd">    <span class="flag">--host</span> <span class="arg">db.internal</span> <span class="flag">--schema</span> <span class="arg">public</span></span>
-<span class="cmd">    <span class="flag">-d</span> <span class="arg">schema/</span></span>
+<span class="cmd">    <span class="flag">--host</span> <span class="arg">db.internal</span></span>
+<span class="cmd">    <span class="arg">schema/</span></span>
 <span class="out"> </span>
 <span class="out">  <span class="ok">✓</span> 71 objects written to schema/</span>
 <span class="out"><span class="dim">  contract v2 · 0 violations</span></span></pre>
@@ -198,22 +203,22 @@
     <div class="verb-panel" data-panel="build">
       <div class="verb-detail reveal">
         <h3>build</h3>
-        <p>Compile the whole declaration into a single, ordered SQL file. Object ordering isn't ours — it comes straight from <code>pg_dump</code>'s own topological sort, so the output restores cleanly every time.</p>
+        <p>Compile the whole declaration into a <code>pg_restore</code>-compatible archive. Object ordering isn't ours; it comes straight from <code>pg_dump</code>'s own topological sort, so the output restores cleanly every time.</p>
         <ul>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Dependency order resolved by libpgdump, not heuristics.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Deterministic: same YAML in, byte-identical SQL out.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Emit a flat <code>.sql</code> file or a <code>pg_restore</code>-ready archive.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Deterministic: same YAML in, byte-identical archive out.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Emit a <code>pg_restore -Fc</code>-compatible archive; restore with <code>pg_restore</code>.</li>
         </ul>
       </div>
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle build</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle build -d schema/ -o build.sql">copy</button></div></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle build</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle build schema/ build.dump">copy</button></div></div>
           <div class="term-body">
-<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">build</span> <span class="t-com"># files → sql</span></span>
-<span class="cmd">    <span class="flag">-d</span> <span class="arg">schema/</span> <span class="flag">-o</span> <span class="arg">build.sql</span></span>
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">build</span> <span class="t-com"># files → archive</span></span>
+<span class="cmd">    <span class="arg">schema/</span> <span class="arg">build.dump</span></span>
 <span class="out"> </span>
 <span class="out"><span class="dim">  topological sort … 71 objects</span></span>
-<span class="out">  <span class="hl">wrote build.sql</span> <span class="dim">(2,184 lines)</span></span>
+<span class="out">  <span class="hl">wrote build.dump</span></span>
 <span class="out">  <span class="ok">✓</span> restore-order verified</span></pre>
           </div>
         </div>
@@ -224,23 +229,46 @@
     <div class="verb-panel" data-panel="create">
       <div class="verb-detail reveal">
         <h3>create</h3>
-        <p>Stand up a brand-new database straight from the declaration — local dev, ephemeral CI, a clean review environment. No migration replay, no ordering surprises.</p>
+        <p>Scaffold a new empty project directory, the starting point before you run <code>pull</code> on an existing database or build a schema from scratch by hand.</p>
         <ul>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> One command from empty cluster to fully-shaped database.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Roles, grants, and PUBLIC ACLs applied exactly as declared.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Perfect for spinning up disposable test databases.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Creates the full directory layout and a <code>project.yaml</code> config.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Sets encoding, superuser, and standard-conforming strings.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Adds <code>.gitkeep</code> files so empty dirs survive your first commit.</li>
         </ul>
       </div>
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle create</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle create -d schema/ --dbname app_local">copy</button></div></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle create</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle create my-project/">copy</button></div></div>
           <div class="term-body">
-<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">create</span> <span class="t-com"># files → db</span></span>
-<span class="cmd">    <span class="flag">-d</span> <span class="arg">schema/</span> <span class="flag">--dbname</span> <span class="arg">app_local</span></span>
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">create</span> <span class="t-com"># scaffold → disk</span></span>
+<span class="cmd">    <span class="arg">my-project/</span></span>
 <span class="out"> </span>
-<span class="out"><span class="dim">  creating app_local …</span></span>
-<span class="out">  <span class="ok">✓</span> 71 objects · 6 roles · 88 grants</span>
-<span class="out">  <span class="hl">app_local ready</span> <span class="dim">in 0.9s</span></span></pre>
+<span class="out"><span class="dim">  created my-project/</span></span>
+<span class="out">  <span class="ok">✓</span> project.yaml · tables/ · views/ · roles/</span>
+<span class="out">  <span class="ok">✓</span> functions/ · schemata/ · sequences/</span></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- DEPLOY -->
+    <div class="verb-panel" data-panel="deploy">
+      <div class="verb-detail reveal">
+        <h3>deploy <span class="pill" style="font-size:11px;padding:2px 8px;vertical-align:middle;">planned</span></h3>
+        <p>Diff the declared state against a live database and apply the delta with no migration files and no replay surprises. Today, deploys still run through your migration tool.</p>
+        <ul>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Computes the diff between the declared schema and the live catalog.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Applies only what changed, with no full drop-and-recreate.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> The missing piece that closes the loop: declare, review, deploy.</li>
+        </ul>
+      </div>
+      <div class="reveal">
+        <div class="term">
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle deploy</b> <span style="opacity:.5;font-size:11px;">(planned)</span></span></div>
+          <div class="term-body">
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="t-com"># diff → apply</span></span>
+<span class="cmd">    <span class="arg">schema/</span> <span class="flag">--dbname</span> <span class="arg">app_production</span></span>
+<span class="out"> </span>
+<span class="out"><span class="dim">  not yet available; coming in a future release</span></span></pre>
           </div>
         </div>
       </div>
@@ -252,10 +280,10 @@
 <section class="section proof" id="proof">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">03 — The proof</span>
+      <span class="kicker-num">03: The proof</span>
       <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>The killer demo</span>
       <h2>The round-trip is a test, not a slogan.</h2>
-      <p class="lead">Dump a database. Pull it into YAML. Build it back. Restore it. Dump again. The two dumps are identical — and that comparison runs as an automated gate on every change.</p>
+      <p class="lead">Dump a database. Pull it into YAML. Build it back. Restore it. Dump again. The two dumps are identical, and that comparison can run as an automated gate on every change.</p>
     </div>
 
     <div class="pipeline reveal" id="pipeline">
@@ -263,7 +291,7 @@
       <div class="parrow">→</div>
       <div class="pstep" data-i="1"><div class="chip tool">pglifecycle pull</div><span class="plabel">→ schema/*.yaml</span></div>
       <div class="parrow">→</div>
-      <div class="pstep" data-i="2"><div class="chip tool">pglifecycle build</div><span class="plabel">→ build.sql</span></div>
+      <div class="pstep" data-i="2"><div class="chip tool">pglifecycle build</div><span class="plabel">→ build.dump</span></div>
       <div class="parrow">→</div>
       <div class="pstep" data-i="3"><div class="chip tool">pg_restore</div><span class="plabel">→ fresh database</span></div>
       <div class="parrow">→</div>
@@ -275,7 +303,7 @@
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
       </div>
       <div class="rtext">
-        <div class="big">diff original.sql roundtrip.sql → 0 differences</div>
+        <div class="big">diff original.dump roundtrip.dump → 0 differences</div>
         <div class="small">The dump that comes out the far end is byte-for-byte identical to the one that went in.</div>
       </div>
       <div class="ci">
@@ -286,18 +314,19 @@
 
     <div class="proof-demo reveal">
       <div class="term">
-        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">round-trip · <b>CI gate</b></span><div class="term-actions"><button class="copy-btn" data-copy="pg_dump app | pglifecycle pull -d schema/ && pglifecycle build -d schema/ -o build.sql">copy</button></div></div>
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">round-trip · <b>CI gate</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="roundtrip-cmds">copy</button></div></div>
         <div class="term-body sm">
-<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pg_dump</span> <span class="flag">-Fc</span> app_production <span class="flag">-f</span> <span class="arg">original.dump</span></span>
-<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">--dbname</span> <span class="arg">app_production</span> <span class="flag">-d</span> <span class="arg">schema/</span></span>
-<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">create</span> <span class="flag">-d</span> <span class="arg">schema/</span> <span class="flag">--dbname</span> <span class="arg">app_roundtrip</span></span>
-<span class="cmd"><span class="prompt">$ </span><span class="bin">pg_dump</span> <span class="flag">-Fc</span> app_roundtrip <span class="flag">-f</span> <span class="arg">roundtrip.dump</span></span>
+<pre id="roundtrip-cmds"><span class="cmd"><span class="prompt">$ </span><span class="bin">pg_dump</span> <span class="flag">-Fc</span> app_production <span class="flag">-f</span> <span class="arg">original.dump</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">--dbname</span> <span class="arg">app_production</span> <span class="arg">schema/</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">build</span> <span class="arg">schema/</span> <span class="arg">roundtrip.dump</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pg_restore</span> <span class="flag">-d</span> <span class="arg">app_roundtrip</span> <span class="arg">roundtrip.dump</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pg_dump</span> <span class="flag">-Fc</span> app_roundtrip <span class="flag">-f</span> <span class="arg">roundtrip2.dump</span></span>
 <span class="out"> </span>
-<span class="cmd"><span class="prompt">$ </span><span class="bin">pg_restore</span> <span class="flag">-l</span> original.dump &gt; a.txt; <span class="bin">pg_restore</span> <span class="flag">-l</span> roundtrip.dump &gt; b.txt</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pg_restore</span> <span class="flag">-l</span> original.dump &gt; a.txt; <span class="bin">pg_restore</span> <span class="flag">-l</span> roundtrip2.dump &gt; b.txt</span>
 <span class="cmd"><span class="prompt">$ </span><span class="bin">diff</span> a.txt b.txt && <span class="bin">echo</span> <span class="arg">"round-trip OK"</span></span>
 <span class="out">  <span class="ok">round-trip OK</span></span>
 <span class="out"> </span>
-<span class="out"><span class="dim">  # if the dumps ever drift, the build fails — loudly, in CI.</span></span></pre>
+<span class="out"><span class="dim">  # if the dumps ever drift, this check catches it, loudly, in CI.</span></span></pre>
         </div>
       </div>
     </div>
@@ -308,10 +337,10 @@
 <section class="section graph" id="graph">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">04 — No manifest</span>
+      <span class="kicker-num">04: No manifest</span>
       <span class="eyebrow" style="margin-left:14px;"><span class="dot"></span>It already knows the graph</span>
       <h2>No ordering file. No manifest. It knows how your schema fits together.</h2>
-      <p class="lead">Other tools make you maintain a hand-ordered list — a manifest that says "run roles, then schemas, then tables, then views." pglifecycle never asks. It reads the dependencies out of your objects and resolves them the same way Postgres does.</p>
+      <p class="lead">Other tools make you maintain a hand-ordered list: a manifest that says "run roles, then schemas, then tables, then views." pglifecycle never asks. It reads the dependencies out of your objects and resolves them the same way Postgres does.</p>
     </div>
 
     <div class="graph-grid">
@@ -366,7 +395,7 @@
               <text x="181" y="260">orders fk</text>
             </g>
           </svg>
-          <div class="graph-foot"><span class="gf-prompt">↳</span> built in pg_dump's topological order — restores clean, every time</div>
+          <div class="graph-foot"><span class="gf-prompt">↳</span> built in pg_dump's topological order; restores clean every time</div>
         </div>
       </div>
 
@@ -384,7 +413,7 @@
           </span>
           <div>
             <b>Dependencies come from the objects</b>
-            <p>A view references a table; a grant references a role; a foreign key references another table. pglifecycle reads those relationships directly — the same catalog facts Postgres itself relies on.</p>
+            <p>A view references a table; a grant references a role; a foreign key references another table. pglifecycle reads those relationships directly, using the same catalog facts Postgres itself relies on.</p>
           </div>
         </div>
         <div class="gc-item">
@@ -405,7 +434,7 @@
 <section class="section" id="different">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">05 — Why it's different</span>
+      <span class="kicker-num">05: Why it's different</span>
       <h2>Built on Postgres' own machinery, not around it.</h2>
       <p class="lead">Plenty of tools generate SQL. pglifecycle is opinionated about exactly two things: schema is <em>data</em>, and the source of truth is whatever <code>pg_dump</code> agrees with.</p>
     </div>
@@ -414,7 +443,7 @@
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
         <h3>Schema as data</h3>
-        <p>Your declared state is structured YAML, not opaque SQL blobs. Query it, diff it, lint it, template it — it's just data.</p>
+        <p>Your declared state is structured YAML, not opaque SQL blobs. Query it, diff it, lint it, template it: it's just data.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c-1 0-3-1-3-3s2-3 3-3-1-2-3-2-3 2-3 0"/><path d="M3 12c1 0 3 1 3 3s-2 3-3 3 1 2 3 2 3-2 3 0"/></svg></div>
@@ -424,22 +453,22 @@
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9 9 0 0 0-6.2 2.5L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9 9 0 0 0 6.2-2.5L21 16"/><path d="M21 21v-5h-5"/></svg></div>
         <h3>Native pg_dump fidelity</h3>
-        <p>Builds round-trip through <code>pg_dump</code> / <code>pg_restore</code> — including pg_dump's own topological sort. We don't reinvent dependency ordering.</p>
+        <p>Builds round-trip through <code>pg_dump</code> / <code>pg_restore</code>, including pg_dump's own topological sort. We don't reinvent dependency ordering.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6"/><path d="M18 6a9 9 0 0 1-9 9"/><circle cx="18" cy="6" r="3"/></svg></div>
         <h3>One file per object</h3>
-        <p>Each table, view, function, and role is its own file. Git history per object — blameable lines, reviewable pull requests, clean merges.</p>
+        <p>Each table, view, function, and role is its own file. Git history per object: blameable lines, reviewable pull requests, clean merges.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3 3-1.5-1.5"/></svg></div>
         <h3>First-class roles &amp; grants</h3>
-        <p>Roles, memberships, and per-object ACLs — <code>PUBLIC</code> included — are versioned objects, not an afterthought bolted on at the end.</p>
+        <p>Roles, memberships, and per-object ACLs (including <code>PUBLIC</code>) are versioned objects, not an afterthought bolted on at the end.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
         <h3>Auto-formatted SQL bodies</h3>
-        <p>Function, view, and trigger bodies are normalized with libpgfmt, so diffs reflect a logic change — not someone's whitespace.</p>
+        <p>Function, view, and trigger bodies are normalized with libpgfmt, so diffs reflect a logic change, not someone's whitespace.</p>
       </div>
     </div>
 
@@ -449,7 +478,7 @@
       </div>
       <div>
         <h3 style="color:#fff;font-size:22px;margin-bottom:8px;">A single Rust binary</h3>
-        <p style="color:var(--text-ondark-2);font-size:15.5px;max-width:760px;">One static binary. No interpreter, no virtualenv, no dependency tree to resolve in CI. Download it, drop it on the runner, and it just runs — on Linux and macOS.</p>
+        <p style="color:var(--text-ondark-2);font-size:15.5px;max-width:760px;">One static binary. No interpreter, no virtualenv, no dependency tree to resolve in CI. Download it, drop it on the runner, and it just runs on Linux and macOS.</p>
       </div>
     </div>
   </div>
@@ -459,9 +488,9 @@
 <section class="section real" id="real">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">06 — See the real thing</span>
+      <span class="kicker-num">06: See the real thing</span>
       <h2>This is what your schema looks like on disk.</h2>
-      <p class="lead">Not a marketing mock-up. The actual <code>users</code> table, the PUBLIC role's ACL, and a real project tree — exactly as pglifecycle writes and reads them.</p>
+      <p class="lead">Not a marketing mock-up. The actual <code>users</code> table, the PUBLIC role's ACL, and a real project tree, exactly as pglifecycle writes and reads them.</p>
     </div>
 
     <div class="real-tabs reveal" id="realTabs">
@@ -511,11 +540,11 @@
       </div>
       <div class="real-aside reveal">
         <h3>One object, fully declared</h3>
-        <p>Columns, identity, primary key, indexes, and grants all live in a single file. There's no migration to read alongside it — this <em>is</em> the table.</p>
+        <p>Columns, identity, primary key, indexes, and grants all live in a single file. There's no migration to read alongside it. This <em>is</em> the table.</p>
         <p class="note">pglifecycle pull wrote this file. pglifecycle build turns it back into the exact <code>CREATE TABLE</code> + <code>GRANT</code> statements pg_dump would emit.</p>
         <ul>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Validated against the JSON-Schema contract on every read and write.</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Grants travel <em>with</em> the table — no separate permissions script.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Grants travel <em>with</em> the table, with no separate permissions script.</li>
         </ul>
       </div>
     </div>
@@ -527,7 +556,7 @@
           <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">schema/roles/<b>PUBLIC.yaml</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="yaml-public">copy</button></div></div>
           <div class="term-body sm" id="yaml-public">
 <pre><span class="t-com"># schema/roles/PUBLIC.yaml</span>
-<span class="t-com"># The PUBLIC pseudo-role — locked down by default.</span>
+<span class="t-com"># The PUBLIC pseudo-role, locked down by default.</span>
 <span class="t-key">name</span>: <span class="t-str">PUBLIC</span>
 <span class="t-key">revoke</span>:
   - <span class="t-key">on</span>: <span class="t-str">SCHEMA public</span>
@@ -546,8 +575,8 @@
       </div>
       <div class="real-aside reveal">
         <h3>PUBLIC is a real, reviewable object</h3>
-        <p>In most tools the implicit <code>PUBLIC</code> grants are invisible — until they're a security finding. Here they're a versioned file you can review in a pull request.</p>
-        <p class="note">Revokes and grants are both explicit, so the resulting ACL is exactly what pg_dump prints — and exactly what restores.</p>
+        <p>In most tools the implicit <code>PUBLIC</code> grants are invisible until they become a security finding. Here they're a versioned file you can review in a pull request.</p>
+        <p class="note">Revokes and grants are both explicit, so the resulting ACL is exactly what pg_dump prints, and exactly what restores.</p>
         <ul>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Default privileges modeled, so future objects inherit the right ACL.</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Changes to access control show up in <code>git blame</code> like any other change.</li>
@@ -559,7 +588,7 @@
     <div class="real-panel" data-realpanel="tree">
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>schema/</b> — project tree</span><div class="term-actions"><button class="copy-btn" data-copy-el="tree-el">copy</button></div></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>schema/</b>: project tree</span><div class="term-actions"><button class="copy-btn" data-copy-el="tree-el">copy</button></div></div>
           <div class="term-body sm"><div class="tree" id="tree-el"><span class="dir">schema/</span>
 <span class="pipe">├── </span><span class="file">pglifecycle.yaml</span>          <span class="com"># project config + contract version</span>
 <span class="pipe">├── </span><span class="dir">schemata/</span>
@@ -583,10 +612,10 @@
       </div>
       <div class="real-aside reveal">
         <h3>A directory you'd actually commit</h3>
-        <p>Objects are grouped by kind, named <code>schema.object.yaml</code>. It reads like a filesystem because it is one — no database required to browse your schema.</p>
+        <p>Objects are grouped by kind, named <code>schema.object.yaml</code>. It reads like a filesystem because it is one. No database required to browse your schema.</p>
         <p class="note">pglifecycle.yaml pins the contract version, so a checkout from two years ago still validates against the schema it was written for.</p>
         <ul>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tiny, focused diffs — a column change touches exactly one file.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tiny, focused diffs: a column change touches exactly one file.</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> CODEOWNERS by directory: roles reviewed by security, tables by the team.</li>
         </ul>
       </div>
@@ -598,24 +627,24 @@
 <section class="section hood" id="internals">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">07 — Under the hood</span>
+      <span class="kicker-num">07: Under the hood</span>
       <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>The crates</span>
       <h2>Three Rust crates do the heavy lifting.</h2>
-      <p class="lead">pglifecycle is the CLI on top. The interesting parts are the libraries underneath — each one published and reusable on its own.</p>
+      <p class="lead">pglifecycle is the CLI on top. The interesting parts are the libraries underneath, each one published and reusable on its own.</p>
     </div>
 
     <div class="crates reveal">
       <div class="crate">
-        <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 7.5 12 12l9-4.5"/><path d="M3 12 12 16.5 21 12"/><path d="M3 16.5 12 21l9-4.5"/></svg> tree-sitter-postgres</div>
-        <p>An incremental parser for the PostgreSQL SQL dialect. Function, view, and check bodies become real syntax trees — so they can be validated and reformatted, never string-matched.</p>
+        <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 7.5 12 12l9-4.5"/><path d="M3 12 12 16.5 21 12"/><path d="M3 16.5 12 21l9-4.5"/></svg> <a href="https://github.com/gmr/tree-sitter-postgres" target="_blank" rel="noopener">tree-sitter-postgres</a></div>
+        <p>An incremental parser for the PostgreSQL SQL dialect. Function, view, and check bodies become real syntax trees, so they can be validated and reformatted rather than string-matched.</p>
       </div>
       <div class="crate">
-        <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg> libpgdump</div>
-        <p>Reads and writes pg_dump's archive format and reproduces its topological object ordering — the reason a built schema restores cleanly without hand-rolled dependency logic.</p>
+        <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg> <a href="https://github.com/gmr/libpgdump" target="_blank" rel="noopener">libpgdump</a></div>
+        <p>Reads and writes pg_dump's archive format and reproduces its topological object ordering: the reason a built schema restores cleanly without hand-rolled dependency logic.</p>
       </div>
       <div class="crate">
-        <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> libpgfmt</div>
-        <p>A canonical formatter for PostgreSQL SQL. Normalizes embedded bodies to one stable style, so version control shows what changed in meaning — not in spacing.</p>
+        <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> <a href="https://github.com/gmr/libpgfmt" target="_blank" rel="noopener">libpgfmt</a></div>
+        <p>A canonical formatter for PostgreSQL SQL. Normalizes embedded bodies to one stable style, so version control shows what changed in meaning, not in spacing.</p>
       </div>
     </div>
 
@@ -627,31 +656,8 @@
       </div>
       <div class="hood-panel">
         <h3>Open source <span class="badge-7y">BSD 3-Clause</span></h3>
-        <p>pglifecycle is released under the BSD 3-Clause license — permissive, business-friendly, and the same license the PostgreSQL project itself uses.</p>
+        <p>pglifecycle is released under the BSD 3-Clause license: permissive, business-friendly, and the same license the PostgreSQL project itself uses.</p>
         <div class="foot">Battle-tested at AWeber on a real, large production schema for over seven years before the rewrite.</div>
-      </div>
-    </div>
-
-    <div class="roadmap reveal">
-      <div class="roadmap-head">
-        <h3>On the roadmap</h3>
-        <span class="pill">Not yet shipped</span>
-      </div>
-      <div class="roadmap-items">
-        <div class="roadmap-item">
-          <span class="rstate">planned</span>
-          <div class="rbody">
-            <b>pull --update</b>
-            <p>Merge fresh introspection into an existing schema directory, preserving comments and ordering instead of overwriting.</p>
-          </div>
-        </div>
-        <div class="roadmap-item">
-          <span class="rstate">planned</span>
-          <div class="rbody">
-            <b>deploy</b>
-            <p>Diff the declared state against a live database and apply the difference. Today, deploys still run through your migration tool.</p>
-          </div>
-        </div>
       </div>
     </div>
   </div>
@@ -662,16 +668,42 @@
   <div class="container cta-inner">
     <div class="reveal">
       <h2>Pull your schema into version control today.</h2>
-      <p>One binary, three verbs, and a round-trip test you can trust. Point it at a database and read the diff.</p>
+      <p>One binary, four commands, and a round-trip test you can trust. Point it at a database and read the diff.</p>
     </div>
-    <div class="cta-install reveal">
+    <div class="install-tabs reveal" id="installTabs">
+      <button class="install-tab active" data-install="homebrew">Homebrew</button>
+      <button class="install-tab" data-install="cargo">Cargo</button>
+      <button class="install-tab" data-install="binary">Pre-built binary</button>
+    </div>
+
+    <div class="install-panel active cta-install reveal" data-installpanel="homebrew">
       <div class="term">
-        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">install</span><div class="term-actions"><button class="copy-btn" data-copy="cargo install pglifecycle">copy</button></div></div>
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">install · <b>Homebrew</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="install-brew">copy</button></div></div>
+        <div class="term-body">
+<pre id="install-brew"><span class="cmd"><span class="prompt">$ </span><span class="bin">brew</span> tap gmr/postgres</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">brew</span> install pglifecycle</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="flag">--version</span></span>
+<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.0</span> <span class="dim">· contract v2 · BSD-3</span></span></pre>
+        </div>
+      </div>
+      <p class="install-note">Homebrew 6.0+ may require trusting the tap first: <code>brew trust --formula gmr/postgres/pglifecycle</code></p>
+    </div>
+
+    <div class="install-panel cta-install reveal" data-installpanel="cargo">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">install · <b>Cargo</b></span><div class="term-actions"><button class="copy-btn" data-copy="cargo install pglifecycle">copy</button></div></div>
         <div class="term-body">
 <pre><span class="cmd"><span class="prompt">$ </span><span class="bin">cargo</span> install pglifecycle</span>
 <span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="flag">--version</span></span>
-<span class="out">  <span class="hl">pglifecycle 2.0</span> <span class="dim">· contract v2 · BSD-3</span></span></pre>
+<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.0</span> <span class="dim">· contract v2 · BSD-3</span></span></pre>
         </div>
+      </div>
+    </div>
+
+    <div class="install-panel cta-install reveal" data-installpanel="binary">
+      <div class="binary-install reveal">
+        <p class="binary-lead">Pre-built binaries for Linux and macOS (x86_64 and aarch64) are attached to each release. No Rust toolchain required.</p>
+        <a class="btn btn-onpg-ghost" href="https://github.com/gmr/pglifecycle/releases">Browse releases <span class="arr">→</span></a>
       </div>
     </div>
     <div class="cta-btns reveal">
@@ -711,7 +743,6 @@
         <a href="#internals">tree-sitter-postgres</a>
         <a href="#internals">libpgdump</a>
         <a href="#internals">libpgfmt</a>
-        <a href="#internals">Roadmap</a>
       </div>
       <div class="footer-col">
         <h4>Project</h4>

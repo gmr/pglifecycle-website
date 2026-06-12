@@ -66,6 +66,23 @@
     });
   });
 
+  /* ---- Install tabs ---- */
+  var installTabs = [].slice.call(document.querySelectorAll('.install-tab'));
+  var installPanels = [].slice.call(document.querySelectorAll('.install-panel'));
+  installTabs.forEach(function (tab) {
+    tab.addEventListener('click', function () {
+      var v = tab.getAttribute('data-install');
+      installTabs.forEach(function (t) { t.classList.toggle('active', t === tab); });
+      installPanels.forEach(function (p) {
+        var on = p.getAttribute('data-installpanel') === v;
+        p.classList.toggle('active', on);
+        if (on) {
+          p.querySelectorAll('.reveal').forEach(function (r) { r.classList.add('in'); });
+        }
+      });
+    });
+  });
+
   /* ---- Copy buttons ---- */
   function flash(btn) {
     var orig = btn.textContent;
