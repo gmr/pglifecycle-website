@@ -584,7 +584,7 @@
         <div class="term">
           <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>schema/</b>: project tree</span><div class="term-actions"><button class="copy-btn" data-copy-el="tree-el">copy</button></div></div>
           <div class="term-body sm"><div class="tree" id="tree-el"><span class="dir">schema/</span>
-<span class="pipe">├── </span><span class="file">pglifecycle.yaml</span>          <span class="com"># project config + contract version</span>
+<span class="pipe">├── </span><span class="file">project.yaml</span>          <span class="com"># project config + contract version</span>
 <span class="pipe">├── </span><span class="dir">schemata/</span>
 <span class="pipe">│   └── </span><span class="file">public.yaml</span>
 <span class="pipe">├── </span><span class="dir">roles/</span>
@@ -607,7 +607,7 @@
       <div class="real-aside reveal">
         <h3>A directory you'd actually commit</h3>
         <p>Objects are grouped by kind, named <code>schema.object.yaml</code>. It reads like a filesystem because it is one. No database required to browse your schema.</p>
-        <p class="note">pglifecycle.yaml pins the contract version, so a checkout from two years ago still validates against the schema it was written for.</p>
+        <p class="note">project.yaml pins the contract version, so a checkout from two years ago still validates against the schema it was written for.</p>
         <ul>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tiny, focused diffs: a column change touches exactly one file.</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> CODEOWNERS by directory: roles reviewed by security, tables by the team.</li>
