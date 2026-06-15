@@ -160,7 +160,7 @@
         <span class="vdesc">Scaffold a new empty project directory.</span>
       </button>
       <button class="verb-tab" data-verb="deploy">
-        <span class="vname"><span class="num">04</span>deploy <span class="pill" style="font-size:10px;padding:1px 6px;vertical-align:middle;margin-left:4px;">planned</span></span>
+        <span class="vname"><span class="num">04</span>deploy</span>
         <span class="vdesc">Diff declared state against a live database and apply changes.</span>
       </button>
     </div>
@@ -174,7 +174,7 @@
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tables, views, functions, sequences, types, roles, and grants.</li>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> SQL bodies parsed with tree-sitter and auto-formatted on the way out.</li>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Output validated against the JSON-Schema contract before it lands.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <code style="white-space:nowrap">--update</code>: Merge fresh introspection into an existing project, preserving comments and ordering. <span class="pill" style="font-size:11px;padding:1px 7px;vertical-align:middle;">planned</span></li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <code style="white-space:nowrap">--update</code>: Merge fresh introspection into an existing project, preserving comments and ordering.</li>
         </ul>
       </div>
       <div class="reveal">
@@ -247,7 +247,7 @@
     <!-- DEPLOY -->
     <div class="verb-panel" data-panel="deploy">
       <div class="verb-detail reveal">
-        <h3>deploy <span class="pill" style="font-size:11px;padding:2px 8px;vertical-align:middle;">planned</span></h3>
+        <h3>deploy</h3>
         <p>Diff the declared state against a live database and apply the delta with no migration files and no replay surprises. Today, deploys still run through your migration tool.</p>
         <ul>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Computes the diff between the declared schema and the live catalog.</li>
@@ -257,7 +257,7 @@
       </div>
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle deploy</b> <span style="opacity:.5;font-size:11px;">(planned)</span></span></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle deploy</b></span></div>
           <div class="term-body">
 <pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="t-com"># diff → apply</span></span>
 <span class="cmd">    <span class="arg">schema/</span> <span class="flag">--dbname</span> <span class="arg">app_production</span></span>
