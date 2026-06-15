@@ -1416,7 +1416,7 @@ a {
 }
 .cta-inner {
     position: relative;
-    max-width: 720px;
+    max-width: 80%;
     margin: 0 auto;
 }
 .cta h2 {
@@ -1431,11 +1431,14 @@ a {
 }
 .cta-install {
     margin: 34px auto 0;
-    max-width: 560px;
-    text-align: left;
+    text-align: center;
 }
 .cta-install .term {
     box-shadow: 0 24px 50px -20px rgba(0, 0, 0, 0.45);
+    max-width: 560px;
+    text-align: left;
+    margin-left: auto;
+    margin-right: auto;
 }
 .cta-btns {
     display: flex;
@@ -1481,8 +1484,8 @@ a {
     font-size: 13px;
     color: rgba(255, 255, 255, 0.7);
     margin-top: 14px;
-    text-align: left;
-    max-width: 560px;
+    text-align: center;
+    white-space: nowrap;
     margin-left: auto;
     margin-right: auto;
 }
