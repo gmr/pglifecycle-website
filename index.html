@@ -68,19 +68,23 @@
         <div class="term-bar">
           <div class="term-dots"><i></i><i></i><i></i></div>
           <span class="term-title">~/app · <b>zsh</b></span>
-          <div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull --dbname app_production schema/">copy</button></div>
+          <div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull -h db.internal -d app schema/">copy</button></div>
         </div>
         <div class="term-body">
-<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">--dbname</span> <span class="arg">app_production</span> <span class="arg">schema/</span></span>
-<span class="out"><span class="dim">  introspecting app_production …</span></span>
-<span class="out">  <span class="ok">✓</span> 41 tables    <span class="ok">✓</span> 12 views     <span class="ok">✓</span> 9 functions</span>
-<span class="out">  <span class="ok">✓</span> 6 roles      <span class="ok">✓</span> 88 grants    <span class="ok">✓</span> 3 sequences</span>
-<span class="out"><span class="dim">  validating against contract v2 …</span> <span class="ok">ok</span></span>
-<span class="out">  <span class="hl">wrote 71 objects → schema/</span></span>
-<span class="out"> </span>
-<span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> diff <span class="flag">--stat</span></span>
-<span class="out">  schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span></span>
-<span class="out"><span class="dim">  1 file changed, 2 insertions(+), 2 deletions(-)</span></span></pre>
+          <pre><span class="out"><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">-h</span> <span class="arg">db.internal</span> <span class="flag">-U</span> <span class="arg">postgres</span> <span class="flag">-d</span> <span class="arg">app</span> <span class="arg">schema/</span> <span class="flag">--exclude-schema</span> <span class="arg">pgq</span></span>
+<span class="dim">pglifecycle v2.0.0</span> Creating postgres@db.internal → schema/
+
+Created schema/ from postgres@db.internal with <span class="hl">3036 objects</span>:
+
+  37  schemas          278  sequences         80  views
+  13  extensions      1734  tables            11  materialized views
+   3  domains          523  functions        191  users
+  62  types            104  roles
+
+  <span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> diff <span class="flag">--stat</span></span>
+schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
+<span class="dim">1 file changed, 2 insertions(+), 2 deletions(-)</span>
+         </span></pre>
         </div>
       </div>
       <p style="font-family:var(--font-mono);font-size:12px;color:var(--text-3);margin-top:14px;text-align:center;">A schema change is now a 4-line diff, not an opaque migration.</p>
@@ -179,15 +183,19 @@
       </div>
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle pull</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull --dbname app_production schema/">copy</button></div></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle pull</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull -h db.internal -d postgres schema/">copy</button></div></div>
           <div class="term-body">
-<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="t-com"># db → files</span></span>
-<span class="cmd">    <span class="flag">--dbname</span> <span class="arg">app_production</span></span>
-<span class="cmd">    <span class="flag">--host</span> <span class="arg">db.internal</span></span>
-<span class="cmd">    <span class="arg">schema/</span></span>
-<span class="out"> </span>
-<span class="out">  <span class="ok">✓</span> 71 objects written to schema/</span>
-<span class="out"><span class="dim">  contract v2 · 0 violations</span></span></pre>
+            <pre><span class="out"><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">-h</span> <span class="arg">db.internal</span> <span class="flag">-U</span> <span class="arg">postgres</span> <span class="flag">-d</span> <span class="arg">app</span> <span class="arg">schema/</span> <span class="flag">--exclude-schema</span> <span class="arg">pgq</span></span>
+
+<span class="dim">pglifecycle v2.0.0</span> Creating postgres@db.internal → schema/
+
+Created schema/ from postgres@db.internal with <span class="hl">3036 objects</span>:
+
+    37  schemas          278  sequences         80  views
+    13  extensions      1734  tables            11  materialized views
+     3  domains          523  functions        191  users
+    62  types            104  roles
+            </span></pre>
           </div>
         </div>
       </div>
@@ -211,7 +219,7 @@
 <pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">build</span> <span class="t-com"># files → archive</span></span>
 <span class="cmd">    <span class="arg">schema/</span> <span class="arg">build.dump</span></span>
 <span class="out"> </span>
-<span class="out"><span class="dim">  topological sort … 71 objects</span></span>
+<span class="out"><span class="dim">  topological sort … 3036 objects</span></span>
 <span class="out">  <span class="hl">wrote build.dump</span></span>
 <span class="out">  <span class="ok">✓</span> restore-order verified</span></pre>
           </div>
