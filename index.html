@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>pglifecycle: Your PostgreSQL schema as version-controlled data</title>
-<meta name="description" content="pglifecycle keeps your PostgreSQL schema in version-controlled YAML: one file per object, validated against a JSON-Schema contract, round-tripped through native pg_dump/pg_restore.">
+<title>pglifecycle: Keep your PostgreSQL schema in version control</title>
+<meta name="description" content="pglifecycle reads PostgreSQL schema objects into validated YAML and builds pg_restore-compatible archives.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
@@ -30,7 +30,7 @@
       <a href="#commands">Commands</a>
       <a href="#proof">Proof</a>
       <a href="#graph">No Manifest</a>
-      <a href="#different">Built Different</a>
+      <a href="#different">Design</a>
       <a href="#internals">Internals</a>
       <a href="https://gmr.github.io/pglifecycle/">Documentation</a>
     </div>
@@ -50,8 +50,8 @@
 <header class="hero">
   <div class="container hero-grid">
     <div class="hero-left">
-      <h1 class="reveal">Your PostgreSQL schema, <span class="accent">as version-controlled data.</span></h1>
-      <p class="hero-sub reveal">pglifecycle keeps your schema in plain YAML: One file per object, validated against a JSON-Schema contract, and round-tripped through native <code>pg_dump</code> / <code>pg_restore</code>.</p>
+      <h1 class="reveal">Keep your PostgreSQL schema <span class="accent">in version control.</span></h1>
+      <p class="hero-sub reveal">pglifecycle reads a PostgreSQL database into plain YAML, with one file for each object. It validates those files against JSON Schema and builds archives that work with <code>pg_restore</code>.</p>
       <div class="hero-cta reveal">
         <a class="btn btn-primary" href="#get-started">Install the binary <span class="arr">→</span></a>
         <a class="btn btn-ghost" href="#proof">See the round-trip proof</a>
@@ -72,7 +72,7 @@
         </div>
         <div class="term-body">
           <pre><span class="out"><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">-h</span> <span class="arg">db.internal</span> <span class="flag">-U</span> <span class="arg">postgres</span> <span class="flag">-d</span> <span class="arg">app</span> <span class="arg">schema/</span> <span class="flag">--exclude-schema</span> <span class="arg">pgq</span></span>
-<span class="dim">pglifecycle v2.0.0</span> Creating postgres@db.internal → schema/
+<span class="dim">pglifecycle v2.0.0-alpha.0</span> Creating postgres@db.internal → schema/
 
 Created schema/ from postgres@db.internal with <span class="hl">3036 objects</span>:
 
@@ -82,12 +82,12 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
   62  types            104  roles
 
   <span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> diff <span class="flag">--stat</span></span>
-schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
+schema/tables/public/users.yaml  <span class="ok">| 4 ++--</span>
 <span class="dim">1 file changed, 2 insertions(+), 2 deletions(-)</span>
          </span></pre>
         </div>
       </div>
-      <p style="font-family:var(--font-mono);font-size:12px;color:var(--text-3);margin-top:14px;text-align:center;">A schema change is now a 4-line diff, not an opaque migration.</p>
+      <p style="font-family:var(--font-mono);font-size:12px;color:var(--text-3);margin-top:14px;text-align:center;">Review a schema change as an ordinary Git diff.</p>
     </div>
   </div>
 </header>
@@ -97,9 +97,9 @@ schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
   <div class="container">
     <div class="section-head reveal">
       <span class="kicker-num">01: The problem</span>
-      <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>Migrations hide state</span>
-      <h2>Ordered migration files tell you how you got here. They never tell you where you are.</h2>
-      <p class="lead">A folder of <code>0001_…sql</code>, <code>0002_…sql</code> is a transaction log, not a schema. To know the current shape of a table you replay history in your head, or you dump the database and read raw SQL. The declared state is never written down.</p>
+      <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>Reviewing current state</span>
+      <h2>Migration files record changes, but the current schema can be difficult to inspect.</h2>
+      <p class="lead">When a table has changed across many numbered SQL files, understanding its current definition means following the full migration history or inspecting a database. pglifecycle adds a checked-in representation of the resulting schema.</p>
     </div>
 
     <div class="compare">
@@ -108,8 +108,8 @@ schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M15 9l-6 6M9 9l6 6"/></svg>
           Migrations: the log
         </span>
-        <h3>State is implied, never stated</h3>
-        <p>The shape of <code>users</code> lives scattered across dozens of append-only SQL files. Reviewers approve deltas they can't fully picture. Drift goes unnoticed.</p>
+        <h3>The definition is spread across migrations</h3>
+        <p>The current shape of <code>users</code> may depend on several SQL files. A reviewer has to combine those changes to understand the complete table.</p>
         <div class="mini-files">
           <div class="row"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> 0001_create_users.sql</div>
           <div class="row"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> 0014_add_email_citext.sql</div>
@@ -123,11 +123,11 @@ schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
           pglifecycle: the state
         </span>
-        <h3>State is the source of truth</h3>
-        <p>pglifecycle inverts the model: it versions the <b>declared state</b> as structured data. One object, one file. The current shape of <code>users</code> is exactly what's on disk.</p>
+        <h3>The complete definition is in one file</h3>
+        <p>pglifecycle stores each object as structured data. The file for <code>users</code> contains the table definition that will be used when the project is built.</p>
         <div class="mini-files">
-          <div class="row"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> tables/public.<span class="obj">users</span>.yaml</div>
-          <div class="row"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> tables/public.<span class="obj">orders</span>.yaml</div>
+          <div class="row"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> tables/public/<span class="obj">users</span>.yaml</div>
+          <div class="row"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> tables/public/<span class="obj">orders</span>.yaml</div>
           <div class="row"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/></svg> roles/<span class="obj">PUBLIC</span>.yaml</div>
           <div class="row" style="color:var(--pg-bright);"><svg class="ic" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg> current state of <span class="obj">users</span> = read the file</div>
         </div>
@@ -136,7 +136,7 @@ schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
 
     <div class="problem-note reveal">
       <span class="arr">↳</span>
-      <span>Migrations still run the deploy. pglifecycle owns the <b>declaration</b>: the canonical, diffable picture of what your database should look like, kept honest by a round-trip test gate.</span>
+      <span>You can continue to use migrations for deployment. pglifecycle provides a separate, reviewable description of the schema and a round-trip check for keeping it accurate.</span>
     </div>
   </div>
 </section>
@@ -146,8 +146,8 @@ schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
   <div class="container">
     <div class="section-head reveal">
       <span class="kicker-num">02: The commands</span>
-      <h2>Four commands. That's the whole surface area.</h2>
-      <p class="lead">pglifecycle does four things, and they compose into everything else: scaffold a new project, read a live database into files, compile files into a restorable archive, and apply the declared state to a live database.</p>
+      <h2>The workflow uses four commands.</h2>
+      <p class="lead">Create a project, pull a live database into YAML, build those files into a restorable archive, or deploy the differences to a database.</p>
     </div>
 
     <div class="verbs-tabs reveal" id="verbTabs">
@@ -173,12 +173,12 @@ schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
     <div class="verb-panel active" data-panel="pull">
       <div class="verb-detail reveal">
         <h3>pull</h3>
-        <p>Point it at any reachable database. pglifecycle reads the catalog through the same paths <code>pg_dump</code> uses, and writes one file per object into your schema directory.</p>
+        <p>Connect to a database and write its objects to a schema directory. pglifecycle uses the PostgreSQL catalog information exposed through <code>pg_dump</code>.</p>
         <ul>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tables, views, functions, sequences, types, roles, and grants.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> SQL bodies parsed with tree-sitter and auto-formatted on the way out.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Output validated against the JSON-Schema contract before it lands.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <code style="white-space:nowrap">--update</code>: Merge fresh introspection into an existing project, preserving comments and ordering.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Parses SQL bodies with tree-sitter and formats them before writing.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Includes cluster roles and users; password hashes are omitted by default.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> With <code style="white-space:nowrap">--update</code>, rewrites only files whose content has changed.</li>
         </ul>
       </div>
       <div class="reveal">
@@ -187,7 +187,7 @@ schema/tables/public.users.yaml  <span class="ok">| 4 ++--</span>
           <div class="term-body">
             <pre><span class="out"><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">-h</span> <span class="arg">db.internal</span> <span class="flag">-U</span> <span class="arg">postgres</span> <span class="flag">-d</span> <span class="arg">app</span> <span class="arg">schema/</span> <span class="flag">--exclude-schema</span> <span class="arg">pgq</span></span>
 
-<span class="dim">pglifecycle v2.0.0</span> Creating postgres@db.internal → schema/
+<span class="dim">pglifecycle v2.0.0-alpha.0</span> Creating postgres@db.internal → schema/
 
 Created schema/ from postgres@db.internal with <span class="hl">3036 objects</span>:
 
@@ -205,11 +205,11 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
     <div class="verb-panel" data-panel="build">
       <div class="verb-detail reveal">
         <h3>build</h3>
-        <p>Compile the whole declaration into a <code>pg_restore</code>-compatible archive. Object ordering isn't ours; it comes straight from <code>pg_dump</code>'s own topological sort, so the output restores cleanly every time.</p>
+        <p>Compile the schema directory into an archive accepted by <code>pg_restore</code>. libpgdump orders the objects using PostgreSQL's dependency information.</p>
         <ul>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Dependency order resolved by libpgdump, not heuristics.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Deterministic: same YAML in, byte-identical archive out.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Emit a <code>pg_restore -Fc</code>-compatible archive; restore with <code>pg_restore</code>.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Resolves dependency order through libpgdump.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Produces a stable restore order for unchanged YAML.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Writes a custom-format archive for <code>pg_restore</code>.</li>
         </ul>
       </div>
       <div class="reveal">
@@ -231,7 +231,7 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
     <div class="verb-panel" data-panel="create">
       <div class="verb-detail reveal">
         <h3>create</h3>
-        <p>Scaffold a new empty project directory, the starting point before you run <code>pull</code> on an existing database or build a schema from scratch by hand.</p>
+        <p>Create an empty project directory. Use it as the destination for <code>pull</code>, or add schema objects by hand.</p>
         <ul>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Creates the full directory layout and a <code>project.yaml</code> config.</li>
           <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Sets encoding, superuser, and standard-conforming strings.</li>
@@ -256,21 +256,25 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
     <div class="verb-panel" data-panel="deploy">
       <div class="verb-detail reveal">
         <h3>deploy</h3>
-        <p>Diff the declared state against a live database and apply the delta with no migration files and no replay surprises. Today, deploys still run through your migration tool.</p>
+        <p>Compare the project with a live database and generate the DDL needed to reconcile them. Output goes to stdout or <code>-o FILE</code>. With <code>--apply</code>, pglifecycle runs the script through <code>psql</code> in one transaction.</p>
         <ul>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Computes the diff between the declared schema and the live catalog.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Applies only what changed, with no full drop-and-recreate.</li>
-          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> The missing piece that closes the loop: declare, review, deploy.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Reconciled in place where PostgreSQL allows it: columns, constraints, indexes, triggers, <code>CREATE OR REPLACE</code> for functions and views, <code>ALTER TYPE … ADD VALUE</code> for enums.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Destructive statements are excluded unless you pass <code>--allow-drop</code>, and <code>--apply</code> refuses while any are pending.</li>
+          <li><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Compare against a <code>pg_dump -Fc</code> file instead of a live connection with <code>-D</code>.</li>
         </ul>
       </div>
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle deploy</b></span></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle deploy</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle deploy -d app_production -o deploy.sql schema/">copy</button></div></div>
           <div class="term-body">
-<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="t-com"># diff → apply</span></span>
-<span class="cmd">    <span class="arg">schema/</span> <span class="flag">--dbname</span> <span class="arg">app_production</span></span>
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="t-com"># diff → DDL</span></span>
+<span class="cmd">    <span class="flag">-d</span> <span class="arg">app_production</span> <span class="flag">-o</span> <span class="arg">deploy.sql</span> <span class="arg">schema/</span></span>
 <span class="out"> </span>
-<span class="out"><span class="dim">  not yet available; coming in a future release</span></span></pre>
+<span class="out"><span class="dim">  Comparing app against postgres@localhost/app_production</span></span>
+<span class="out"><span class="dim">  Plan: 7 statement(s) included, 1 excluded</span></span>
+<span class="out">  <span class="hl">wrote deploy.sql</span></span>
+<span class="out"> </span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">psql</span> <span class="flag">--single-transaction</span> <span class="flag">-v</span> ON_ERROR_STOP=1 <span class="flag">-f</span> <span class="arg">deploy.sql</span></span></pre>
           </div>
         </div>
       </div>
@@ -283,9 +287,9 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
   <div class="container">
     <div class="section-head reveal">
       <span class="kicker-num">03: The proof</span>
-      <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>The killer demo</span>
-      <h2>The round-trip is a test, not a slogan.</h2>
-      <p class="lead">Dump a database. Pull it into YAML. Build it back. Restore it. Dump again. The two dumps are identical, and that comparison can run as an automated gate on every change.</p>
+      <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>Round-trip verification</span>
+      <h2>Check the generated archive against the source database.</h2>
+      <p class="lead">Start with a database dump, convert the database to YAML, build and restore it, then dump the restored database. Comparing the two archive listings checks that the same objects appear in the same restore order.</p>
     </div>
 
     <div class="pipeline reveal" id="pipeline">
@@ -305,8 +309,8 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
       </div>
       <div class="rtext">
-        <div class="big">diff original.dump roundtrip.dump → 0 differences</div>
-        <div class="small">The dump that comes out the far end is byte-for-byte identical to the one that went in.</div>
+        <div class="big">diff &lt;(pg_restore -l original.dump) &lt;(pg_restore -l roundtrip.dump) → 0 differences</div>
+        <div class="small">An empty diff means the two archive listings contain the same objects in the same order.</div>
       </div>
       <div class="ci">
         <span class="dim"># .github/workflows/schema.yml</span><br>
@@ -328,7 +332,7 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
 <span class="cmd"><span class="prompt">$ </span><span class="bin">diff</span> a.txt b.txt && <span class="bin">echo</span> <span class="arg">"round-trip OK"</span></span>
 <span class="out">  <span class="ok">round-trip OK</span></span>
 <span class="out"> </span>
-<span class="out"><span class="dim">  # if the dumps ever drift, this check catches it, loudly, in CI.</span></span></pre>
+<span class="out"><span class="dim">  # run this comparison in CI to detect a round-trip difference</span></span></pre>
         </div>
       </div>
     </div>
@@ -340,9 +344,9 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
   <div class="container">
     <div class="section-head reveal">
       <span class="kicker-num">04: No manifest</span>
-      <span class="eyebrow" style="margin-left:14px;"><span class="dot"></span>It already knows the graph</span>
-      <h2>No ordering file. No manifest. It knows how your schema fits together.</h2>
-      <p class="lead">Other tools make you maintain a hand-ordered list: a manifest that says "run roles, then schemas, then tables, then views." pglifecycle never asks. It reads the dependencies out of your objects and resolves them the same way Postgres does.</p>
+      <span class="eyebrow" style="margin-left:14px;"><span class="dot"></span>Dependency ordering</span>
+      <h2>Object dependencies determine the restore order.</h2>
+      <p class="lead">pglifecycle derives most dependencies from the schema objects and passes them to libpgdump for topological sorting. You do not have to maintain a separate, hand-ordered manifest.</p>
     </div>
 
     <div class="graph-grid">
@@ -397,7 +401,7 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
               <text x="181" y="260">orders fk</text>
             </g>
           </svg>
-          <div class="graph-foot"><span class="gf-prompt">↳</span> built in pg_dump's topological order; restores clean every time</div>
+          <div class="graph-foot"><span class="gf-prompt">↳</span> ordered with pg_dump's topological sort</div>
         </div>
       </div>
 
@@ -405,8 +409,8 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
         <div class="gc-item">
           <span class="gc-x">✕</span>
           <div>
-            <b>The manifest you don't write</b>
-            <p>There's no <code>order.txt</code>, no numbered prefixes, no "depends_on" key for you to keep in sync. Add a foreign key and the edge appears in the graph on its own.</p>
+            <b>No separate ordering manifest</b>
+            <p>There is no <code>order.txt</code> or set of numbered prefixes. Most relationships come from the objects themselves. A <code>dependencies:</code> key handles relationships that cannot be inferred.</p>
           </div>
         </div>
         <div class="gc-item">
@@ -415,7 +419,7 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
           </span>
           <div>
             <b>Dependencies come from the objects</b>
-            <p>A view references a table; a grant references a role; a foreign key references another table. pglifecycle reads those relationships directly, using the same catalog facts Postgres itself relies on.</p>
+            <p>Views, grants, and foreign keys already refer to other objects. pglifecycle uses those references to construct the dependency graph.</p>
           </div>
         </div>
         <div class="gc-item">
@@ -423,8 +427,8 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg>
           </span>
           <div>
-            <b>Ordered by pg_dump, not by us</b>
-            <p>When it's time to build, the topological sort is borrowed straight from <code>pg_dump</code> via libpgdump. So "what depends on what" is decided by the same engine that has gotten it right for decades.</p>
+            <b>Topological sorting from pg_dump</b>
+            <p>During a build, libpgdump uses the topological sorting behavior from <code>pg_dump</code> to place objects in restore order.</p>
           </div>
         </div>
       </div>
@@ -436,41 +440,41 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
 <section class="section" id="different">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">05: Why it's different</span>
-      <h2>Built on Postgres' own machinery, not around it.</h2>
-      <p class="lead">Plenty of tools generate SQL. pglifecycle is opinionated about exactly two things: schema is <em>data</em>, and the source of truth is whatever <code>pg_dump</code> agrees with.</p>
+      <span class="kicker-num">05: Design</span>
+      <h2>Structured schema files with PostgreSQL-compatible output.</h2>
+      <p class="lead">The project format is intended for version control, while the build process stays compatible with PostgreSQL's archive and restore tools.</p>
     </div>
 
     <div class="diff-grid reveal">
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg></div>
         <h3>Schema as data</h3>
-        <p>Your declared state is structured YAML, not opaque SQL blobs. Query it, diff it, lint it, template it: it's just data.</p>
+        <p>Schema objects are stored as YAML, where they can be reviewed, queried, linted, or generated with existing tools.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M21 12c-1 0-3-1-3-3s2-3 3-3-1-2-3-2-3 2-3 0"/><path d="M3 12c1 0 3 1 3 3s-2 3-3 3 1 2 3 2 3-2 3 0"/></svg></div>
         <h3>A JSON-Schema contract</h3>
-        <p>Every object is validated against a published JSON-Schema before it's accepted. Typos and invalid shapes fail fast, not at deploy time.</p>
+        <p>Each object is validated against the published JSON Schema when the project loads, so invalid fields and shapes are reported before a build or deploy.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 0 0-9-9 9 9 0 0 0-6.2 2.5L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9 9 0 0 0 6.2-2.5L21 16"/><path d="M21 21v-5h-5"/></svg></div>
         <h3>Native pg_dump fidelity</h3>
-        <p>Builds round-trip through <code>pg_dump</code> / <code>pg_restore</code>, including pg_dump's own topological sort. We don't reinvent dependency ordering.</p>
+        <p>Builds use the <code>pg_dump</code> archive format and its topological ordering, and the result can be restored with <code>pg_restore</code>.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M6 9v6"/><path d="M18 6a9 9 0 0 1-9 9"/><circle cx="18" cy="6" r="3"/></svg></div>
         <h3>One file per object</h3>
-        <p>Each table, view, function, and role is its own file. Git history per object: blameable lines, reviewable pull requests, clean merges.</p>
+        <p>Each table, view, function, and role has its own file, keeping diffs and Git history scoped to the object that changed.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 11l-3 3-1.5-1.5"/></svg></div>
         <h3>First-class roles &amp; grants</h3>
-        <p>Roles, memberships, and per-object ACLs (including <code>PUBLIC</code>) are versioned objects, not an afterthought bolted on at the end.</p>
+        <p>Roles, memberships, and per-object ACLs, including <code>PUBLIC</code>, are stored in the project alongside schema objects.</p>
       </div>
       <div class="diff-card">
         <div class="ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
         <h3>Auto-formatted SQL bodies</h3>
-        <p>Function, view, and trigger bodies are normalized with libpgfmt, so diffs reflect a logic change, not someone's whitespace.</p>
+        <p>libpgfmt normalizes function, view, and trigger bodies so formatting differences do not dominate a diff.</p>
       </div>
     </div>
 
@@ -480,7 +484,7 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
       </div>
       <div>
         <h3 style="color:#fff;font-size:22px;margin-bottom:8px;">A single Rust binary</h3>
-        <p style="color:var(--text-ondark-2);font-size:15.5px;max-width:760px;">One static binary. No interpreter, no virtualenv, no dependency tree to resolve in CI. Download it, drop it on the runner, and it just runs on Linux and macOS.</p>
+        <p style="color:var(--text-ondark-2);font-size:15.5px;max-width:760px;">pglifecycle is distributed as a static binary for Linux and macOS. It does not require an interpreter or a project-level runtime environment.</p>
       </div>
     </div>
   </div>
@@ -490,13 +494,13 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
 <section class="section real" id="real">
   <div class="container">
     <div class="section-head reveal">
-      <span class="kicker-num">06: See the real thing</span>
-      <h2>This is what your schema looks like on disk.</h2>
-      <p class="lead">Not a marketing mock-up. The actual <code>users</code> table, the PUBLIC role's ACL, and a real project tree, exactly as pglifecycle writes and reads them.</p>
+      <span class="kicker-num">06: Project files</span>
+      <h2>Examples from a schema directory.</h2>
+      <p class="lead">These examples show a table, the ACL for the <code>PUBLIC</code> role, and the directory layout produced and consumed by pglifecycle.</p>
     </div>
 
     <div class="real-tabs reveal" id="realTabs">
-      <button class="real-tab active" data-real="users">public.users.yaml</button>
+      <button class="real-tab active" data-real="users">tables/public/users.yaml</button>
       <button class="real-tab" data-real="public">roles/PUBLIC.yaml</button>
       <button class="real-tab" data-real="tree">project tree</button>
     </div>
@@ -505,48 +509,46 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
     <div class="real-panel active" data-realpanel="users">
       <div class="reveal">
         <div class="term">
-          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">schema/tables/<b>public.users.yaml</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="yaml-users">copy</button></div></div>
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">schema/tables/public/<b>users.yaml</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="yaml-users">copy</button></div></div>
           <div class="term-body sm" id="yaml-users">
-<pre><span class="t-com"># schema/tables/public.users.yaml</span>
-<span class="t-key">schema</span>: <span class="t-str">public</span>
+<pre><span class="t-com"># schema/tables/public/users.yaml</span>
 <span class="t-key">name</span>: <span class="t-str">users</span>
+<span class="t-key">schema</span>: <span class="t-str">public</span>
 <span class="t-key">owner</span>: <span class="t-str">app</span>
+<span class="t-key">comment</span>: <span class="t-str">Application users</span>
 <span class="t-key">columns</span>:
   - <span class="t-key">name</span>: <span class="t-str">id</span>
-    <span class="t-key">type</span>: <span class="t-type">bigint</span>
+    <span class="t-key">data_type</span>: <span class="t-type">BIGINT</span>
     <span class="t-key">nullable</span>: <span class="t-kw">false</span>
-    <span class="t-key">identity</span>: <span class="t-str">always</span>
+    <span class="t-key">generated</span>:
+      <span class="t-key">sequence_behavior</span>: <span class="t-str">ALWAYS</span>
   - <span class="t-key">name</span>: <span class="t-str">email</span>
-    <span class="t-key">type</span>: <span class="t-type">citext</span>
+    <span class="t-key">data_type</span>: <span class="t-type">citext</span>
     <span class="t-key">nullable</span>: <span class="t-kw">false</span>
-  - <span class="t-key">name</span>: <span class="t-str">full_name</span>
-    <span class="t-key">type</span>: <span class="t-type">text</span>
+  - {<span class="t-key">name</span>: <span class="t-str">full_name</span>, <span class="t-key">data_type</span>: <span class="t-type">TEXT</span>}
   - <span class="t-key">name</span>: <span class="t-str">created_at</span>
-    <span class="t-key">type</span>: <span class="t-type">timestamptz</span>
+    <span class="t-key">data_type</span>: <span class="t-type">TIMESTAMP WITH TIME ZONE</span>
     <span class="t-key">nullable</span>: <span class="t-kw">false</span>
-    <span class="t-key">default</span>: <span class="t-fn">now()</span>
-<span class="t-key">primary_key</span>:
-  <span class="t-key">name</span>: <span class="t-str">users_pkey</span>
-  <span class="t-key">columns</span>: [<span class="t-str">id</span>]
+    <span class="t-key">default</span>: <span class="t-fn">CURRENT_TIMESTAMP</span>
+<span class="t-key">primary_key</span>: <span class="t-str">id</span>
 <span class="t-key">indexes</span>:
   - <span class="t-key">name</span>: <span class="t-str">users_email_key</span>
-    <span class="t-key">columns</span>: [<span class="t-str">email</span>]
+    <span class="t-key">columns</span>:
+      - <span class="t-key">name</span>: <span class="t-str">email</span>
     <span class="t-key">unique</span>: <span class="t-kw">true</span>
-<span class="t-key">grants</span>:
-  - <span class="t-key">role</span>: <span class="t-str">app_readwrite</span>
-    <span class="t-key">privileges</span>: [<span class="t-str">SELECT</span>, <span class="t-str">INSERT</span>, <span class="t-str">UPDATE</span>, <span class="t-str">DELETE</span>]
-  - <span class="t-key">role</span>: <span class="t-str">app_readonly</span>
-    <span class="t-key">privileges</span>: [<span class="t-str">SELECT</span>]</pre>
+<span class="t-key">dependencies</span>:
+  <span class="t-key">extensions</span>:
+    - <span class="t-str">citext</span></pre>
           </div>
         </div>
       </div>
       <div class="real-aside reveal">
-        <h3>One object, fully declared</h3>
-        <p>Columns, identity, primary key, indexes, and grants all live in a single file. There's no migration to read alongside it. This <em>is</em> the table.</p>
-        <p class="note">pglifecycle pull wrote this file. pglifecycle build turns it back into the exact <code>CREATE TABLE</code> + <code>GRANT</code> statements pg_dump would emit.</p>
+        <h3>A complete table definition</h3>
+        <p>The columns, generated identity, primary key, indexes, and comment are kept together in the table's YAML file.</p>
+        <p class="note"><code>pull</code> writes this representation from a database. <code>build</code> converts it into the statements stored in the output archive.</p>
         <ul>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Validated against the JSON-Schema contract on every read and write.</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Grants travel <em>with</em> the table, with no separate permissions script.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Validated against the JSON Schema when the project loads.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> The file path implies <code>schema</code> and <code>name</code>, so both are optional in the body.</li>
         </ul>
       </div>
     </div>
@@ -560,27 +562,27 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
 <pre><span class="t-com"># schema/roles/PUBLIC.yaml</span>
 <span class="t-com"># The PUBLIC pseudo-role, locked down by default.</span>
 <span class="t-key">name</span>: <span class="t-str">PUBLIC</span>
-<span class="t-key">revoke</span>:
-  - <span class="t-key">on</span>: <span class="t-str">SCHEMA public</span>
-    <span class="t-key">privileges</span>: [<span class="t-str">ALL</span>]
-  - <span class="t-key">on</span>: <span class="t-str">DATABASE app</span>
-    <span class="t-key">privileges</span>: [<span class="t-str">ALL</span>]
+<span class="t-key">create</span>: <span class="t-kw">false</span>   <span class="t-com"># defined, never created</span>
+<span class="t-key">revocations</span>:
+  <span class="t-key">schemata</span>:
+    <span class="t-key">public</span>:
+      - <span class="t-str">ALL</span>
+  <span class="t-key">databases</span>:
+    <span class="t-key">app</span>:
+      - <span class="t-str">ALL</span>
 <span class="t-key">grants</span>:
-  - <span class="t-key">on</span>: <span class="t-str">DATABASE app</span>
-    <span class="t-key">privileges</span>: [<span class="t-str">CONNECT</span>]
-<span class="t-key">default_acls</span>:
-  - <span class="t-key">in_schema</span>: <span class="t-str">public</span>
-    <span class="t-key">on</span>: <span class="t-str">TABLES</span>
-    <span class="t-key">privileges</span>: []   <span class="t-com"># no implicit grants to PUBLIC</span></pre>
+  <span class="t-key">databases</span>:
+    <span class="t-key">app</span>:
+      - <span class="t-str">CONNECT</span></pre>
           </div>
         </div>
       </div>
       <div class="real-aside reveal">
-        <h3>PUBLIC is a real, reviewable object</h3>
-        <p>In most tools the implicit <code>PUBLIC</code> grants are invisible until they become a security finding. Here they're a versioned file you can review in a pull request.</p>
-        <p class="note">Revokes and grants are both explicit, so the resulting ACL is exactly what pg_dump prints, and exactly what restores.</p>
+        <h3>Review access granted to PUBLIC</h3>
+        <p>The implicit <code>PUBLIC</code> role has its own versioned file, so changes to its grants and revocations appear in pull requests.</p>
+        <p class="note">Grants and revocations are grouped by object type and used to reproduce the ACL during a build.</p>
         <ul>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Default privileges modeled, so future objects inherit the right ACL.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> ACLs live on the grantee, so one file shows everything a role can reach.</li>
           <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Changes to access control show up in <code>git blame</code> like any other change.</li>
         </ul>
       </div>
@@ -592,33 +594,39 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
         <div class="term">
           <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>schema/</b>: project tree</span><div class="term-actions"><button class="copy-btn" data-copy-el="tree-el">copy</button></div></div>
           <div class="term-body sm"><div class="tree" id="tree-el"><span class="dir">schema/</span>
-<span class="pipe">├── </span><span class="file">project.yaml</span>          <span class="com"># project config + contract version</span>
+<span class="pipe">├── </span><span class="file">project.yaml</span>          <span class="com"># name, encoding, extensions, languages</span>
 <span class="pipe">├── </span><span class="dir">schemata/</span>
 <span class="pipe">│   └── </span><span class="file">public.yaml</span>
 <span class="pipe">├── </span><span class="dir">roles/</span>
 <span class="pipe">│   ├── </span><span class="file">PUBLIC.yaml</span>
 <span class="pipe">│   ├── </span><span class="file">app_readwrite.yaml</span>
 <span class="pipe">│   └── </span><span class="file">app_readonly.yaml</span>
+<span class="pipe">├── </span><span class="dir">users/</span>
+<span class="pipe">│   └── </span><span class="file">app.yaml</span>
 <span class="pipe">├── </span><span class="dir">tables/</span>
-<span class="pipe">│   ├── </span><span class="file">public.users.yaml</span>
-<span class="pipe">│   ├── </span><span class="file">public.orders.yaml</span>
-<span class="pipe">│   └── </span><span class="file">public.sessions.yaml</span>
+<span class="pipe">│   └── </span><span class="dir">public/</span>
+<span class="pipe">│       ├── </span><span class="file">users.yaml</span>
+<span class="pipe">│       ├── </span><span class="file">orders.yaml</span>
+<span class="pipe">│       └── </span><span class="file">sessions.yaml</span>
 <span class="pipe">├── </span><span class="dir">views/</span>
-<span class="pipe">│   └── </span><span class="file">public.active_users.yaml</span>
+<span class="pipe">│   └── </span><span class="dir">public/</span>
+<span class="pipe">│       └── </span><span class="file">active_users.yaml</span>
 <span class="pipe">├── </span><span class="dir">functions/</span>
-<span class="pipe">│   └── </span><span class="file">public.set_updated_at.yaml</span>
+<span class="pipe">│   └── </span><span class="dir">public/</span>
+<span class="pipe">│       └── </span><span class="file">set_updated_at.yaml</span>
 <span class="pipe">└── </span><span class="dir">sequences/</span>
-<span class="pipe">    └── </span><span class="file">public.orders_id_seq.yaml</span></div>
+<span class="pipe">    └── </span><span class="dir">public/</span>
+<span class="pipe">        └── </span><span class="file">orders_id_seq.yaml</span></div>
           </div>
         </div>
       </div>
       <div class="real-aside reveal">
-        <h3>A directory you'd actually commit</h3>
-        <p>Objects are grouped by kind, named <code>schema.object.yaml</code>. It reads like a filesystem because it is one. No database required to browse your schema.</p>
-        <p class="note">project.yaml pins the contract version, so a checkout from two years ago still validates against the schema it was written for.</p>
+        <h3>Directory layout</h3>
+        <p>Objects are grouped first by kind and then by schema, as in <code>tables/public/users.yaml</code>. You can browse the project without connecting to a database.</p>
+        <p class="note">The binary validates every file against its JSON Schema when the project loads.</p>
         <ul>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Tiny, focused diffs: a column change touches exactly one file.</li>
-          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> CODEOWNERS by directory: roles reviewed by security, tables by the team.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> A column change is normally contained in one table file.</li>
+          <li><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Directory paths can be used with CODEOWNERS for separate review rules.</li>
         </ul>
       </div>
     </div>
@@ -630,36 +638,36 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
   <div class="container">
     <div class="section-head reveal">
       <span class="kicker-num">07: Under the hood</span>
-      <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>The crates</span>
-      <h2>Three Rust crates do the heavy lifting.</h2>
-      <p class="lead">pglifecycle is the CLI on top. The interesting parts are the libraries underneath, each one published and reusable on its own.</p>
+      <span class="eyebrow eyebrow--ondark" style="margin-left:14px;"><span class="dot"></span>Rust libraries</span>
+      <h2>The CLI is built on three supporting crates.</h2>
+      <p class="lead">The parser, archive handling, and SQL formatting are implemented in separate, published libraries.</p>
     </div>
 
     <div class="crates reveal">
       <div class="crate">
         <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v18"/><path d="M3 7.5 12 12l9-4.5"/><path d="M3 12 12 16.5 21 12"/><path d="M3 16.5 12 21l9-4.5"/></svg> <a href="https://github.com/gmr/tree-sitter-postgres" target="_blank" rel="noopener">tree-sitter-postgres</a></div>
-        <p>An incremental parser for the PostgreSQL SQL dialect. Function, view, and check bodies become real syntax trees, so they can be validated and reformatted rather than string-matched.</p>
+        <p>An incremental parser for the PostgreSQL SQL dialect. It parses function, view, and check bodies into syntax trees for validation and formatting.</p>
       </div>
       <div class="crate">
         <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M3 5v14a9 3 0 0 0 18 0V5"/><path d="M3 12a9 3 0 0 0 18 0"/></svg> <a href="https://github.com/gmr/libpgdump" target="_blank" rel="noopener">libpgdump</a></div>
-        <p>Reads and writes pg_dump's archive format and reproduces its topological object ordering: the reason a built schema restores cleanly without hand-rolled dependency logic.</p>
+        <p>Reads and writes the pg_dump archive format and implements its topological object ordering for generated archives.</p>
       </div>
       <div class="crate">
         <div class="cname"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> <a href="https://github.com/gmr/libpgfmt" target="_blank" rel="noopener">libpgfmt</a></div>
-        <p>A canonical formatter for PostgreSQL SQL. Normalizes embedded bodies to one stable style, so version control shows what changed in meaning, not in spacing.</p>
+        <p>A formatter for PostgreSQL SQL that normalizes embedded bodies to a consistent style before they are written to YAML.</p>
       </div>
     </div>
 
     <div class="hood-strip reveal">
       <div class="hood-panel">
         <h3>Rewritten in Rust <span class="badge-rust">v2</span></h3>
-        <p>v2 is a ground-up Rust rewrite: a single static binary, faster introspection, and a strict contract. Same workflow, far fewer moving parts.</p>
-        <div class="foot">Footnote: v1 was written in Python and has run AWeber's production schema for 7+ years. v2 keeps the verbs identical so existing schema directories carry over.</div>
+        <p>Version 2 rewrites the CLI in Rust and distributes it as a static binary. The project files are validated against a defined schema.</p>
+        <div class="foot">Version 1 was written in Python and has managed AWeber's production schema for more than seven years. Version 2 retains the existing command names and schema-directory workflow.</div>
       </div>
       <div class="hood-panel">
         <h3>Open source <span class="badge-7y">BSD 3-Clause</span></h3>
-        <p>pglifecycle is released under the BSD 3-Clause license: permissive, business-friendly, and the same license the PostgreSQL project itself uses.</p>
-        <div class="foot">Battle-tested at AWeber on a real, large production schema for over seven years before the rewrite.</div>
+        <p>pglifecycle is available under the BSD 3-Clause license, the same license used by PostgreSQL.</p>
+        <div class="foot">The original implementation has been used with AWeber's production schema for more than seven years.</div>
       </div>
     </div>
   </div>
@@ -669,12 +677,13 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
 <section class="cta" id="get-started">
   <div class="container cta-inner">
     <div class="reveal">
-      <h2>Pull your schema into version control today.</h2>
-      <p>One binary, four commands, and a round-trip test you can trust. Point it at a database and read the diff.</p>
+      <h2>Try pglifecycle with an existing database.</h2>
+      <p>Install the binary, pull the database into a schema directory, and review the generated files.</p>
     </div>
     <div class="install-tabs reveal" id="installTabs">
       <button class="install-tab active" data-install="homebrew">Homebrew</button>
       <button class="install-tab" data-install="cargo">Cargo</button>
+      <button class="install-tab" data-install="docker">Docker</button>
       <button class="install-tab" data-install="binary">Pre-built binary</button>
     </div>
 
@@ -685,7 +694,7 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
 <pre id="install-brew"><span class="cmd"><span class="prompt">$ </span><span class="bin">brew</span> tap gmr/postgres</span>
 <span class="cmd"><span class="prompt">$ </span><span class="bin">brew</span> install pglifecycle</span>
 <span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="flag">--version</span></span>
-<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.0</span> <span class="dim">· contract v2 · BSD-3</span></span></pre>
+<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.0</span></span></pre>
         </div>
       </div>
       <p class="install-note">Homebrew 6.0+ may require trusting the tap first: <code>brew trust --formula gmr/postgres/pglifecycle</code></p>
@@ -697,9 +706,20 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
         <div class="term-body">
 <pre><span class="cmd"><span class="prompt">$ </span><span class="bin">cargo</span> install pglifecycle</span>
 <span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="flag">--version</span></span>
-<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.0</span> <span class="dim">· contract v2 · BSD-3</span></span></pre>
+<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.0</span></span></pre>
         </div>
       </div>
+    </div>
+
+    <div class="install-panel cta-install reveal" data-installpanel="docker">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">install · <b>Docker</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="install-docker">copy</button></div></div>
+        <div class="term-body">
+<pre id="install-docker"><span class="cmd"><span class="prompt">$ </span><span class="bin">docker</span> run <span class="flag">--rm</span> <span class="flag">--user</span> <span class="arg">"$(id -u):$(id -g)"</span> <span class="flag">-v</span> <span class="arg">"$PWD:/project"</span> \</span>
+<span class="cmd">    ghcr.io/gmr/pglifecycle:latest build my-project/ mydb.dump</span></pre>
+        </div>
+      </div>
+      <p class="install-note">The image bundles the PostgreSQL 17 client tools pglifecycle shells out to, and works in <code>/project</code>. It runs as uid 65532, so <code>--user</code> hands the container your own uid for a bind-mounted directory you own.</p>
     </div>
 
     <div class="install-panel cta-install reveal" data-installpanel="binary">
@@ -731,7 +751,7 @@ Created schema/ from postgres@db.internal with <span class="hl">3036 objects</sp
           </svg>
           <span class="wordmark">pg<b style="color:var(--pg-bright)">lifecycle</b></span>
         </a>
-        <p>Your PostgreSQL schema as version-controlled data. One file per object, validated against a contract, round-tripped through native pg_dump.</p>
+        <p>Store PostgreSQL schema objects as validated YAML and build them into a pg_restore-compatible archive.</p>
       </div>
       <div class="footer-col">
         <h4>Product</h4>
