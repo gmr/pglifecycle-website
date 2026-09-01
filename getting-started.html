@@ -1,0 +1,449 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Getting started with pglifecycle</title>
+<meta name="description" content="Install pglifecycle, pull a PostgreSQL database into YAML, edit an object, preview the generated DDL, and apply it.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;0,700;1,400&family=IBM+Plex+Mono:ital,wght@0,400;0,500;0,600;0,700;1,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23336791' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M21 12a9 9 0 0 0-9-9 9 9 0 0 0-6.2 2.5L3 8'/%3E%3Cpath d='M3 3v5h5'/%3E%3Cpath d='M3 12a9 9 0 0 0 9 9 9 9 0 0 0 6.2-2.5L21 16'/%3E%3Cpath d='M21 21v-5h-5'/%3E%3C/svg%3E">
+</head>
+<body>
+
+<!-- ============================= NAV ============================= -->
+<nav class="nav" id="nav">
+  <div class="container nav-inner">
+    <a class="brand" href="index.html#top" aria-label="pglifecycle home">
+      <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="#336791" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M21 12a9 9 0 0 0-9-9 9 9 0 0 0-6.2 2.5L3 8"/>
+        <path d="M3 3v5h5"/>
+        <path d="M3 12a9 9 0 0 0 9 9 9 9 0 0 0 6.2-2.5L21 16"/>
+        <path d="M21 21v-5h-5"/>
+      </svg>
+      <span class="wordmark">pg<b>lifecycle</b></span>
+    </a>
+    <div class="nav-links">
+      <a href="index.html#commands">Commands</a>
+      <a href="index.html#proof">Proof</a>
+      <a href="index.html#different">Design</a>
+      <a href="index.html#internals">Internals</a>
+      <a href="getting-started.html" aria-current="page" style="color:var(--pg)">Getting Started</a>
+      <a href="https://gmr.github.io/pglifecycle/">Documentation</a>
+    </div>
+    <div class="nav-cta">
+      <a class="nav-gh" href="https://github.com/gmr/pglifecycle/" aria-label="GitHub repository" target="_blank">
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 .5C5.7.5.5 5.7.5 12c0 5.1 3.3 9.4 7.9 10.9.6.1.8-.2.8-.6v-2c-3.2.7-3.9-1.5-3.9-1.5-.5-1.3-1.3-1.7-1.3-1.7-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1 1.8 2.7 1.3 3.4 1 .1-.8.4-1.3.7-1.6-2.6-.3-5.3-1.3-5.3-5.7 0-1.3.5-2.3 1.2-3.1-.1-.3-.5-1.5.1-3.1 0 0 1-.3 3.3 1.2a11.5 11.5 0 0 1 6 0c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.8.1 3.1.8.8 1.2 1.8 1.2 3.1 0 4.4-2.7 5.4-5.3 5.7.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6 4.6-1.5 7.9-5.8 7.9-10.9C23.5 5.7 18.3.5 12 .5z"/></svg>
+        GitHub
+      </a>
+      <a class="btn btn-primary" href="#step-1">Start <span class="arr">→</span></a>
+    </div>
+  </div>
+</nav>
+
+<span id="top"></span>
+
+<!-- ============================= HEADER ============================= -->
+<header class="gs-head">
+  <div class="container">
+    <span class="kicker-num">Getting started</span>
+    <h1>Make your first schema change with pglifecycle.</h1>
+    <p class="lead">This guide installs pglifecycle, pulls an existing database into YAML, changes a table, previews the generated DDL, and applies it.</p>
+
+    <div class="gs-prereq">
+      <h2>Before you start</h2>
+      <ul>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> The PostgreSQL client tools on your <code>PATH</code>. pglifecycle runs <code>pg_dump</code> and <code>pg_dumpall</code> to read a cluster, and <code>psql</code> to apply a script.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> A database you can read. To include roles and users, your database role must also be able to run <code>pg_dumpall --roles-only</code>.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> A database you can change in step 5. Use a development database or a copy of production for your first run.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> The usual PostgreSQL connection flags or environment variables, such as <code>-h</code>/<code>PGHOST</code>, <code>-U</code>/<code>PGUSER</code>, and <code>-d</code>/<code>PGDATABASE</code>.</li>
+      </ul>
+    </div>
+  </div>
+</header>
+
+<!-- ============================= STEP 1 ============================= -->
+<section class="section gs-step" id="step-1">
+  <div class="container gs-grid">
+    <div class="gs-copy reveal">
+      <span class="gs-num">Step 01</span>
+      <h2>Install the binary</h2>
+      <p>pglifecycle is distributed as a single static binary. Select your platform for installation options.</p>
+      <p>Confirm that the binary is available before continuing.</p>
+    </div>
+    <div class="gs-term reveal">
+      <div class="install-tabs gs-install-tabs" id="gsInstallTabs">
+        <button class="install-tab active" data-install="gs-macos">macOS / Homebrew</button>
+        <button class="install-tab" data-install="gs-linux">Linux / Docker</button>
+        <button class="install-tab" data-install="gs-other">Other / From Source</button>
+      </div>
+
+      <div class="install-panel active" data-installpanel="gs-macos">
+        <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">install · <b>Homebrew</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-install">copy</button></div></div>
+        <div class="term-body">
+<pre id="gs-install"><span class="cmd"><span class="prompt">$ </span><span class="bin">brew</span> tap gmr/postgres</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">brew</span> install pglifecycle</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="flag">--version</span></span>
+<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.1</span></span></pre>
+          </div>
+        </div>
+        <p class="gs-note">If Homebrew fails with <code>build.rb … exited with 1</code>, run <code>brew trust --formula gmr/postgres/pglifecycle</code> first.</p>
+      </div>
+
+      <div class="install-panel" data-installpanel="gs-linux">
+        <div class="term">
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">install · <b>Docker</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-install-linux">copy</button></div></div>
+          <div class="term-body">
+<pre id="gs-install-linux"><span class="t-com"># includes the PostgreSQL 17 client tools</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">docker</span> run <span class="flag">--rm</span> <span class="flag">--user</span> <span class="arg">"$(id -u):$(id -g)"</span> <span class="flag">-v</span> <span class="arg">"$PWD:/project"</span> \</span>
+<span class="cmd">    ghcr.io/gmr/pglifecycle:latest <span class="flag">--version</span></span></pre>
+          </div>
+        </div>
+        <p class="gs-note">Pre-built Linux binaries for x86_64 and aarch64 are attached to each <a href="https://github.com/gmr/pglifecycle/releases">release</a>.</p>
+      </div>
+
+      <div class="install-panel" data-installpanel="gs-other">
+        <div class="term">
+          <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">install · <b>Cargo</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-install-cargo">copy</button></div></div>
+          <div class="term-body">
+<pre id="gs-install-cargo"><span class="t-com"># requires a Rust toolchain</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">cargo</span> install pglifecycle</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="flag">--version</span></span>
+<span class="out">  <span class="hl">pglifecycle 2.0.0-alpha.1</span></span></pre>
+          </div>
+        </div>
+        <p class="gs-note">Pre-built macOS binaries are also available on the <a href="https://github.com/gmr/pglifecycle/releases">releases page</a>.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= STEP 2 ============================= -->
+<section class="section gs-step gs-step-alt" id="step-2">
+  <div class="container gs-grid">
+    <div class="gs-copy reveal">
+      <span class="gs-num">Step 02</span>
+      <h2>Pull the database into a project</h2>
+      <p><code>pull</code> reads the database and writes one YAML file for each object. The project directory contains <code>project.yaml</code> and directories for tables, views, functions, roles, and other object types. Objects that belong to a schema are grouped by schema.</p>
+      <p>Commit the project before changing it. This gives you a baseline for the changes that follow.</p>
+      <ul>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Skip objects you do not want to own with <code>-N</code>/<code>--exclude-schema</code>, <code>-T</code>/<code>--exclude-table</code>, and <code>--exclude-extension</code>. Each is repeatable.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Cluster roles and users come from <code>pg_dumpall</code> and are included by default. Leave them out with <code>--no-roles</code>, or leave privileges out entirely with <code>-x</code>.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Password hashes are omitted unless you pass <code>--include-password-hashes</code>. They are written to the project as plain text, so only enable it for a repository you trust.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> To pull from an existing <code>pg_dump -Fc</code> file instead of a live database, pass it with <code>-D</code>. Roles are skipped because there is no cluster to read them from.</li>
+      </ul>
+    </div>
+    <div class="gs-term reveal">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle pull</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle pull -h localhost -U postgres -d app_production schema/">copy</button></div></div>
+        <div class="term-body">
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">-h</span> <span class="arg">localhost</span> <span class="flag">-U</span> <span class="arg">postgres</span> <span class="flag">-d</span> <span class="arg">app_production</span> <span class="arg">schema/</span></span>
+<span class="out"><span class="dim">pglifecycle v2.0.0-alpha.1</span> Creating app_production@localhost → schema/
+
+Created schema/ with <span class="hl">412 objects</span>:
+
+    4  schemas         38  sequences        11  views
+    2  extensions      37  tables            1  materialized view
+    3  types           26  functions        14  users
+                                             9  roles</span></pre>
+        </div>
+      </div>
+      <div class="term gs-term-alt">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">commit the baseline</span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-baseline">copy</button></div></div>
+        <div class="term-body sm">
+<pre id="gs-baseline"><span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> init <span class="flag">-q</span> <span class="t-com"># if this is a new repository</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> add schema/</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> commit <span class="flag">-qm</span> <span class="arg">"Pull app_production into schema/"</span></span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= STEP 3 ============================= -->
+<section class="section gs-step" id="step-3">
+  <div class="container gs-grid">
+    <div class="gs-copy reveal">
+      <span class="gs-num">Step 03</span>
+      <h2>Change the schema in YAML</h2>
+      <p>Edit the YAML file for the object you want to change. In this example, the <code>users</code> table gets a <code>last_login_at</code> column and an index. The file path identifies the schema and object name, so those fields are optional in the file.</p>
+      <p>Every file is validated against the JSON Schema for its object type when the project loads, so a typo in a key or an unknown field is reported before pglifecycle talks to a database.</p>
+      <p class="note">The result is a small Git diff that shows the table definition being changed.</p>
+    </div>
+    <div class="gs-term reveal">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">schema/tables/public/<b>users.yaml</b></span></div>
+        <div class="term-body sm">
+<pre><span class="t-key">name</span>: <span class="t-str">users</span>
+<span class="t-key">schema</span>: <span class="t-str">public</span>
+<span class="t-key">owner</span>: <span class="t-str">app</span>
+<span class="t-key">columns</span>:
+  - <span class="t-key">name</span>: <span class="t-str">id</span>
+    <span class="t-key">data_type</span>: <span class="t-type">BIGINT</span>
+    <span class="t-key">nullable</span>: <span class="t-kw">false</span>
+  - {<span class="t-key">name</span>: <span class="t-str">email</span>, <span class="t-key">data_type</span>: <span class="t-type">citext</span>, <span class="t-key">nullable</span>: <span class="t-kw">false</span>}
+  - <span class="t-key">name</span>: <span class="t-str">created_at</span>
+    <span class="t-key">data_type</span>: <span class="t-type">TIMESTAMP WITH TIME ZONE</span>
+    <span class="t-key">nullable</span>: <span class="t-kw">false</span>
+    <span class="t-key">default</span>: <span class="t-fn">CURRENT_TIMESTAMP</span>
+<span class="gs-ins">  - <span class="t-key">name</span>: <span class="t-str">last_login_at</span>
+    <span class="t-key">data_type</span>: <span class="t-type">TIMESTAMP WITH TIME ZONE</span></span>
+<span class="t-key">primary_key</span>: <span class="t-str">id</span>
+<span class="t-key">indexes</span>:
+  - <span class="t-key">name</span>: <span class="t-str">users_email_key</span>
+    <span class="t-key">columns</span>:
+      - <span class="t-key">name</span>: <span class="t-str">email</span>
+    <span class="t-key">unique</span>: <span class="t-kw">true</span>
+<span class="gs-ins">  - <span class="t-key">name</span>: <span class="t-str">users_last_login_at_idx</span>
+    <span class="t-key">columns</span>:
+      - <span class="t-key">name</span>: <span class="t-str">last_login_at</span></span></pre>
+        </div>
+      </div>
+      <div class="term gs-term-alt">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">review the change</span><div class="term-actions"><button class="copy-btn" data-copy="git diff --stat schema/">copy</button></div></div>
+        <div class="term-body sm">
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> diff <span class="flag">--stat</span> <span class="arg">schema/</span></span>
+<span class="out">schema/tables/public/users.yaml <span class="ok">| 5 +++++</span>
+<span class="dim">1 file changed, 5 insertions(+)</span></span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= STEP 4 ============================= -->
+<section class="section gs-step gs-step-alt" id="step-4">
+  <div class="container gs-grid">
+    <div class="gs-copy reveal">
+      <span class="gs-num">Step 04</span>
+      <h2>Preview the DDL</h2>
+      <p><code>deploy</code> compares the project with a database and generates the DDL needed to make them match. Without <code>--apply</code>, it does not change the database. The DDL is written to standard output or to the file specified by <code>-o</code>.</p>
+      <p>Add <code>-v</code> to show a summary of the plan. Log messages go to standard error, leaving standard output available for the generated SQL.</p>
+      <ul>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Changes are reconciled in place where PostgreSQL allows it: columns, constraints, indexes, triggers, <code>CREATE OR REPLACE</code> for functions and views, <code>ALTER TYPE … ADD VALUE</code> for enums.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Drops and drop-and-recreate fallbacks are left out unless you pass <code>--allow-drop</code>. Each one excluded is reported as a warning.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Preview against a dump instead of a live database with <code>-D</code>, or leave grants out of the comparison with <code>-x</code>.</li>
+      </ul>
+      <p class="note">If you want to review the SQL in the pull request, write it to a file and commit it with the YAML change.</p>
+    </div>
+    <div class="gs-term reveal">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle deploy</b> · preview</span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle deploy -v -h localhost -U postgres -d app_production schema/">copy</button></div></div>
+        <div class="term-body">
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="flag">-v</span> <span class="flag">-d</span> <span class="arg">app_production</span> <span class="arg">schema/</span></span>
+<span class="out"><span class="dim">  INFO  pglifecycle v2.0.0-alpha.1 running deploy
+  INFO  Comparing app_production against localhost:5432/app_production
+  INFO  Plan: 2 statement(s) included, 0 excluded</span>
+
+<span class="t-com">-- pglifecycle deploy
+-- project: app_production
+-- source: localhost:5432/app_production
+-- destructive statements: none</span>
+
+<span class="t-com">-- TABLE public.users</span>
+<span class="t-kw">ALTER TABLE</span> public.users
+    <span class="t-kw">ADD COLUMN</span> last_login_at <span class="t-type">timestamp with time zone</span>;
+
+<span class="t-com">-- INDEX public.users_last_login_at_idx</span>
+<span class="t-kw">CREATE INDEX</span> users_last_login_at_idx <span class="t-kw">ON</span> public.users <span class="t-kw">USING</span> btree (last_login_at);</span></pre>
+        </div>
+      </div>
+      <div class="term gs-term-alt">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">keep the script</span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle deploy -d app_production -o deploy.sql schema/">copy</button></div></div>
+        <div class="term-body sm">
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="flag">-d</span> <span class="arg">app_production</span> <span class="flag">-o</span> <span class="arg">deploy.sql</span> <span class="arg">schema/</span></span>
+
+<span class="t-com"># or compare against a dump rather than a live database</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="flag">-D</span> <span class="arg">app_production.dump</span> <span class="flag">-o</span> <span class="arg">deploy.sql</span> <span class="arg">schema/</span></span></pre>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= STEP 5 ============================= -->
+<section class="section gs-step" id="step-5">
+  <div class="container gs-grid">
+    <div class="gs-copy reveal">
+      <span class="gs-num">Step 05</span>
+      <h2>Apply the change</h2>
+      <p>With <code>--apply</code>, pglifecycle runs the generated script through <code>psql</code> using <code>--single-transaction</code> and <code>ON_ERROR_STOP=1</code>. If a statement fails, the transaction is rolled back.</p>
+      <ul>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <code>--apply</code> refuses to run while destructive statements are pending. Review them, then re-run with <code>--allow-drop</code> to include them.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> <code>--apply</code> cannot be combined with <code>-D</code>: there is nothing to apply to in a dump file.</li>
+        <li><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></svg> Prefer your own psql invocation? Keep the script from step 4 and run it yourself.</li>
+      </ul>
+      <p>To verify the result, pull the database again with <code>--update</code>. It rewrites only files whose contents changed. If <code>git diff</code> has no output, the database and project match.</p>
+    </div>
+    <div class="gs-term reveal">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title"><b>pglifecycle deploy --apply</b></span><div class="term-actions"><button class="copy-btn" data-copy="pglifecycle deploy -v -d app_production --apply schema/">copy</button></div></div>
+        <div class="term-body">
+<pre><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="flag">-v</span> <span class="flag">-d</span> <span class="arg">app_production</span> <span class="flag">--apply</span> <span class="arg">schema/</span></span>
+<span class="out"><span class="dim">  INFO  Comparing app_production against localhost:5432/app_production
+  INFO  Plan: 2 statement(s) included, 0 excluded
+  INFO  Applying 2 statement(s)</span>
+  <span class="ok">✓</span> <span class="hl">Deploy applied successfully</span></span></pre>
+        </div>
+      </div>
+      <div class="term gs-term-alt">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">verify against the database</span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-verify">copy</button></div></div>
+        <div class="term-body sm">
+<pre id="gs-verify"><span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">pull</span> <span class="flag">-d</span> <span class="arg">app_production</span> <span class="flag">--update</span> <span class="arg">schema/</span></span>
+<span class="out"><span class="dim">pglifecycle v2.0.0-alpha.1</span> Updating app_production@localhost → schema/
+</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> diff <span class="flag">--stat</span> <span class="arg">schema/</span></span>
+<span class="out"><span class="dim">  (no output: the project matches the database)</span></span></pre>
+        </div>
+      </div>
+      <p class="gs-note">Test the deployment against a copy of production before applying it to the production database.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= GIT / CI ============================= -->
+<section class="section gs-step gs-step-alt" id="git">
+  <div class="container gs-grid">
+    <div class="gs-copy reveal">
+      <span class="gs-num">Git and CI</span>
+      <h2>Where Git fits</h2>
+      <p>A pglifecycle project is a directory of text files, so it works with the same Git workflow you use for code:</p>
+      <ol class="gs-ol">
+        <li>Create a branch, edit the object's YAML, and commit the change.</li>
+        <li>For the pull request, run <code>deploy</code> without <code>--apply</code> against a copy of the target database. Review the generated DDL with the YAML change.</li>
+        <li>On merge, run the same command with <code>--apply</code>.</li>
+        <li>Run <code>pull --update</code> against the live database periodically. A non-empty <code>git diff</code> shows a change made outside the project.</li>
+      </ol>
+      <p class="note"><code>deploy</code> compares the project with the database's current state. It does not replay a sequence of migrations.</p>
+      <p>A GitHub Action for installing pglifecycle is in progress. Until it is available, install a release binary or use the container image in your job.</p>
+    </div>
+    <div class="gs-term reveal">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">.github/workflows/<b>schema.yaml</b></span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-ci">copy</button></div></div>
+        <div class="term-body sm">
+<pre id="gs-ci"><span class="t-key">name</span>: <span class="t-str">schema</span>
+<span class="t-key">on</span>: [<span class="t-str">pull_request</span>]
+
+<span class="t-key">jobs</span>:
+  <span class="t-key">preview</span>:
+    <span class="t-key">runs-on</span>: <span class="t-str">ubuntu-latest</span>
+    <span class="t-key">container</span>: <span class="t-str">ghcr.io/gmr/pglifecycle:latest</span>
+    <span class="t-key">steps</span>:
+      - <span class="t-key">uses</span>: <span class="t-str">actions/checkout@v4</span>
+      - <span class="t-key">name</span>: <span class="t-str">Preview the DDL</span>
+        <span class="t-key">env</span>:
+          <span class="t-key">PGHOST</span>: <span class="t-str">${{ secrets.PGHOST }}</span>
+          <span class="t-key">PGUSER</span>: <span class="t-str">${{ secrets.PGUSER }}</span>
+          <span class="t-key">PGDATABASE</span>: <span class="t-str">app_staging</span>
+          <span class="t-key">PGPASSWORD</span>: <span class="t-str">${{ secrets.PGPASSWORD }}</span>
+        <span class="t-key">run</span>: <span class="t-str">pglifecycle deploy -v -o deploy.sql schema/</span>
+      - <span class="t-key">uses</span>: <span class="t-str">actions/upload-artifact@v4</span>
+        <span class="t-key">with</span>:
+          <span class="t-key">name</span>: <span class="t-str">deploy-sql</span>
+          <span class="t-key">path</span>: <span class="t-str">deploy.sql</span></pre>
+        </div>
+      </div>
+      <div class="term gs-term-alt">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">the branch, end to end</span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-branch">copy</button></div></div>
+        <div class="term-body sm">
+<pre id="gs-branch"><span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> checkout <span class="flag">-b</span> <span class="arg">users-last-login</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">$EDITOR</span> schema/tables/public/users.yaml</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">deploy</span> <span class="flag">-d</span> <span class="arg">app_staging</span> <span class="arg">schema/</span> <span class="t-com"># read before committing</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> commit <span class="flag">-am</span> <span class="arg">"Track last_login_at on users"</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">git</span> push <span class="flag">-u</span> <span class="arg">origin</span> <span class="arg">users-last-login</span></span></pre>
+        </div>
+      </div>
+      <p class="gs-note">Store the deploy credentials as repository secrets; pglifecycle reads the standard PG* variables, so no flags carry them.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ============================= NEXT ============================= -->
+<section class="cta" id="next">
+  <div class="container cta-inner">
+    <div class="reveal">
+      <h2>Where to go next</h2>
+      <p>You can also build a restorable archive or create a new project from scratch.</p>
+    </div>
+    <div class="cta-install reveal">
+      <div class="term">
+        <div class="term-bar"><div class="term-dots"><i></i><i></i><i></i></div><span class="term-title">build a restorable archive</span><div class="term-actions"><button class="copy-btn" data-copy-el="gs-next">copy</button></div></div>
+        <div class="term-body">
+<pre id="gs-next"><span class="t-com"># compile the project into a pg_restore-compatible archive</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">build</span> <span class="arg">schema/</span> <span class="arg">app.dump</span></span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">createdb</span> app_review &amp;&amp; <span class="bin">pg_restore</span> <span class="flag">-d</span> <span class="arg">app_review</span> <span class="arg">app.dump</span></span>
+
+<span class="t-com"># or start a project from nothing and write the objects by hand</span>
+<span class="cmd"><span class="prompt">$ </span><span class="bin">pglifecycle</span> <span class="sub">create</span> <span class="arg">new-project/</span></span></pre>
+        </div>
+      </div>
+    </div>
+    <div class="cta-btns reveal">
+      <a class="btn btn-onpg" href="https://gmr.github.io/pglifecycle/">Read the docs <span class="arr">→</span></a>
+      <a class="btn btn-onpg-ghost" href="index.html#proof">See the round-trip proof <span class="arr">→</span></a>
+    </div>
+  </div>
+</section>
+
+<footer class="footer">
+  <div class="container">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <a class="brand" href="index.html#top">
+          <svg class="logo" viewBox="0 0 24 24" fill="none" stroke="#5b9bc9" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M21 12a9 9 0 0 0-9-9 9 9 0 0 0-6.2 2.5L3 8"/>
+            <path d="M3 3v5h5"/>
+            <path d="M3 12a9 9 0 0 0 9 9 9 9 0 0 0 6.2-2.5L21 16"/>
+            <path d="M21 21v-5h-5"/>
+          </svg>
+          <span class="wordmark">pg<b style="color:var(--pg-bright)">lifecycle</b></span>
+        </a>
+        <p>Store PostgreSQL schema objects as validated YAML and build them into a pg_restore-compatible archive.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Getting started</h4>
+        <a href="#step-1">Install</a>
+        <a href="#step-2">Pull a database</a>
+        <a href="#step-4">Preview the DDL</a>
+        <a href="#step-5">Apply the change</a>
+        <a href="#git">Git and CI</a>
+      </div>
+      <div class="footer-col">
+        <h4>Product</h4>
+        <a href="index.html#commands">Commands</a>
+        <a href="index.html#proof">Round-trip proof</a>
+        <a href="index.html#real">Schema on disk</a>
+      </div>
+      <div class="footer-col">
+        <h4>Project</h4>
+        <a href="https://github.com/gmr/pglifecycle">GitHub</a>
+        <a href="https://gmr.github.io/pglifecycle/">Documentation</a>
+        <a href="https://github.com/gmr/pglifecycle/tree/main/schemata">JSON-Schema contract</a>
+        <a href="https://github.com/gmr/pglifecycle/blob/main/LICENSE">BSD 3-Clause license</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <div class="footer-license">
+        <span class="lic">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 11V7a4 4 0 0 0-8 0v4"/><rect x="5" y="11" width="14" height="10" rx="2"/></svg>
+          BSD 3-Clause
+        </span>
+        <span>© 2026 Gavin M. Roy, AWeber</span>
+      </div>
+      <a class="made-by" href="https://www.aweber.com" target="_blank" rel="noopener">
+        <img src="assets/aweber-mark.png" alt="AWeber">
+        <span class="mb-text">
+          <span class="top">Made by</span>
+          <span class="name">AWeber</span>
+        </span>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
